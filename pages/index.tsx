@@ -22,11 +22,11 @@ import { TasksDeleted } from '@/src/subpages/TasksDeleted';
 
 
 export default function Home() {
-  const [isOpen, setIsOpen] = React.useState<boolean>(true);
+  const [isOpen, setIsOpen] = React.useState<boolean>(false);
   const cancelRef = React.useRef(null);
   const onClose = () => setIsOpen(false);
   // Context
-  const { categories, setTasksCompleted } = useProvider();
+  const { user, categories, setTasksCompleted } = useProvider();
   // React Use Effect
   React.useEffect(() => {
     if (categories == null) return;
@@ -36,7 +36,7 @@ export default function Home() {
     <>
 
       <AlertDialog
-        isOpen={isOpen}
+        isOpen={user === null}
         leastDestructiveRef={cancelRef}
         onClose={onClose}
       >

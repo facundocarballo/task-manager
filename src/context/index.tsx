@@ -7,11 +7,13 @@ import { ITask } from "../components/Task";
 // Context Initialization
 const TaskManagerContext = React.createContext<ITaskManagerContext>({
     // React useState attributes
+    user: null,
     categories: null,
     tasksCompleted: [],
     tasksDeleted: [],
 
     // React useState methods
+    setUser: () => { },
     setCategories: () => { },
     setTasksCompleted: () => { }, 
     setTasksDeleted: () => { }
@@ -20,15 +22,18 @@ const TaskManagerContext = React.createContext<ITaskManagerContext>({
 // Context Creation
 export const ContextProvider: React.FC<any> = (props: any) => {
     // React useState variables
+    const [user, setUser] = React.useState<any>(null);
     const [categories, setCategories] = React.useState<ICategory[] | null>(DATA_CATEGORIES);
     const [tasksCompleted, setTasksCompleted] = React.useState<ITask[]>([]);
     const [tasksDeleted, setTasksDeleted] = React.useState<ITask[]>([]);
 
     const values = {
+        user,
         categories,
         tasksCompleted,
         tasksDeleted,
-
+        
+        setUser,
         setCategories,
         setTasksCompleted,
         setTasksDeleted
