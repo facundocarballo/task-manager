@@ -15,31 +15,46 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   AlertDialogCloseButton,
+  Spinner,
 } from "@chakra-ui/react";
 import React from "react";
 import { useProvider } from "../context";
 import { CreateCategory } from "../components/CreateCategory";
 import { MiniCategory } from "../components/MiniCategory";
+import { User } from "@/types/user";
 
 export const Categories = () => {
   // Attributes
   const [newTitle, setNewTitle] = React.useState<string>("");
   const [newDescription, setNewDescription] = React.useState<string>("");
   const [newColor, setNewColor] = React.useState<string>("dark.bg");
+  const [loading, setLoading] = React.useState<boolean>(false);
 
   // Alert Dialog
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef(null);
   // Context
-  const { user } = useProvider();
+  const { user, setUser } = useProvider();
   // Methods
   const handleCreateCategory = async () => {
     if (user == null) {
       console.error("Error user was null when trying to create a category.");
       return;
     }
-    user.CreateCategory(newTitle, newDescription, newColor)
+    setLoading(true);
+    await user.CreateCategory(newTitle, newDescription, newColor);
+    const newUser = new User(user);
+    setUser(newUser);
+    setLoading(false);
+    clearInputs();
+    onClose();
   };
+  
+  const clearInputs = () => {
+    setNewColor("dark.bg");
+    setNewDescription("");
+    setNewTitle("");
+  }
   // Component
   return (
     <>
@@ -66,34 +81,40 @@ export const Categories = () => {
               />
             </AlertDialogBody>
             <AlertDialogFooter>
-              <Button variant="primary" onClick={handleCreateCategory}>
-                CREATE CATEGORY
-              </Button>
+              {!loading ? (
+                <Button variant="primary" onClick={handleCreateCategory}>
+                  CREATE CATEGORY
+                </Button>
+              ) : (
+                <Spinner />
+              )}
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
 
-      <VStack w="full">
-        <HStack w="full">
-          <Box w="20px" />
-          <Heading>Categories</Heading>
-          <Spacer />
-          <Button variant="secundary" onClick={onOpen}>
-            Create Category
-          </Button>
-          <Box w="20px" />
-        </HStack>
-        <Grid templateColumns="repeat(3, 1fr)" gap={6}>
-          {user == null
-            ? null
-            : user.categories.map((cat, idx) => (
+      {user === null ? null : (
+        <>
+          <VStack w="full">
+            <HStack w="full">
+              <Box w="20px" />
+              <Heading>Categories</Heading>
+              <Spacer />
+              <Button variant="secundary" onClick={onOpen}>
+                Create Category
+              </Button>
+              <Box w="20px" />
+            </HStack>
+            <Grid templateColumns="repeat(3, 1fr)" gap={6}>
+              {user.categories.map((cat, idx) => (
                 <GridItem key={idx}>
                   <MiniCategory cat={cat} />
                 </GridItem>
               ))}
-        </Grid>
-      </VStack>
+            </Grid>
+          </VStack>
+        </>
+      )}
     </>
   );
 };

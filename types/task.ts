@@ -1,6 +1,7 @@
 import { db } from "@/firebase/config";
 import { COLLECTION_Category, COLLECTION_Task, COLLECTION_TaskCompleted, COLLECTION_TaskDeleted, COLLECTION_USER } from "@/firebase/constants/collections";
-import { DocumentData, Timestamp, deleteDoc, doc, setDoc } from "firebase/firestore";
+import { DocumentData, Timestamp, collection, deleteDoc, doc, setDoc } from "firebase/firestore";
+import { Category } from "./category";
 
 export interface TaskDates {
     created: Date,
@@ -18,20 +19,22 @@ export class Task {
     dates: TaskDates;
 
     constructor(
-        data: DocumentData,
         uid: string,
+        name: string,
+        description: string,
         category: string,
         owner: string,
+        dates: TaskDates
     ) {
         this.uid = uid;
         this.category = category;
         this.owner = owner;
-        this.name = data.name;
-        this.description = data.description;
-        this.dates = this._GetDatesFromData(data);
+        this.name = name;
+        this.description = description;
+        this.dates = dates;
     }
 
-    private _GetDatesFromData(data: DocumentData): TaskDates {
+    static GetDatesFromData(data: DocumentData): TaskDates {
         let mustEnd = undefined;
         let finished = undefined;
         let deleted = undefined;
@@ -51,6 +54,7 @@ export class Task {
         }
     }
 
+    // Delete permanetly from the database.
     private async _Delete(): Promise<undefined> {
         try {
             await deleteDoc(
@@ -69,51 +73,77 @@ export class Task {
 
     async Complete(): Promise<undefined> {
         try {
-            await setDoc(
-                doc(
-                  db,
-                  COLLECTION_USER + "/" + this.owner + "/" + 
-                  COLLECTION_Category + "/" + this.category + "/" + 
-                  COLLECTION_TaskCompleted,
-                  this.uid
-                ),
-                {
-                  name: this.name,
-                  description: this.description,
-                  finished: Timestamp.now(),
-                  created: Timestamp.fromDate(this.dates.created),
-                  mustEnd: this.dates.mustEnd === undefined ? null : Timestamp.fromDate(this.dates.mustEnd),
-                  category: this.uid,
-                  owner: this.owner
-                }
+            const ref = doc(
+                collection(
+                    db,
+                    COLLECTION_USER + "/" + this.owner + "/" + 
+                    COLLECTION_Category + "/" + this.category + "/" + 
+                    COLLECTION_TaskCompleted
+                )
             );
+            if (this.dates.mustEnd !== undefined) {
+                await setDoc(
+                    ref,
+                    {
+                      name: this.name,
+                      description: this.description,
+                      finished: Timestamp.now(),
+                      created: Timestamp.fromDate(this.dates.created),
+                      mustEnd: Timestamp.fromDate(this.dates.mustEnd),
+                      category: this.uid,
+                      owner: this.owner
+                    }
+                );
+            } else {
+                await setDoc(
+                    ref,
+                    {
+                      name: this.name,
+                      description: this.description,
+                      finished: Timestamp.now(),
+                      created: Timestamp.fromDate(this.dates.created),
+                      category: this.uid,
+                      owner: this.owner
+                    }
+                );
+            }
+            await this._Delete();
         } catch(err) {
             console.error("Error completing task. ", err);
         }
-
-        await this._Delete()
     }
 
+    // Send to tasks deleted.
     async Delete(): Promise<undefined> {
         try {
-            await setDoc(
-                doc(
-                  db,
-                  COLLECTION_USER + "/" + this.owner + "/" + 
-                  COLLECTION_Category + "/" + this.category + "/" + 
-                  COLLECTION_TaskDeleted,
-                  this.uid
-                ),
-                {
-                  name: this.name,
-                  description: this.description,
-                  deleted: Timestamp.now(),
-                  created: Timestamp.fromDate(this.dates.created),
-                  mustEnd: this.dates.mustEnd === undefined ? null : Timestamp.fromDate(this.dates.mustEnd),
-                  category: this.uid,
-                  owner: this.owner
-                }
+            const ref = doc(
+                collection(
+                    db,
+                    COLLECTION_USER + "/" + this.owner + "/" + 
+                    COLLECTION_Category + "/" + this.category + "/" + 
+                    COLLECTION_TaskDeleted
+                )
             );
+            if (this.dates.mustEnd !== undefined) {
+                await setDoc(ref, {
+                    name: this.name,
+                    description: this.description,
+                    deleted: Timestamp.now(),
+                    created: Timestamp.fromDate(this.dates.created),
+                    mustEnd: Timestamp.fromDate(this.dates.mustEnd),
+                    category: this.uid,
+                    owner: this.owner
+                })
+            } else {
+                await setDoc(ref, {
+                    name: this.name,
+                    description: this.description,
+                    deleted: Timestamp.now(),
+                    created: Timestamp.fromDate(this.dates.created),
+                    category: this.uid,
+                    owner: this.owner
+                })
+            }
         } catch(err) {
             console.error("Error completing task. ", err);
         }

@@ -15,6 +15,7 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   AlertDialogCloseButton,
+  Spinner,
 } from "@chakra-ui/react";
 import React from "react";
 import { TaskComponent } from "./Task";
@@ -22,6 +23,7 @@ import { InputInfo } from "./InputInfo";
 import { CreateCategory } from "./CreateCategory";
 import { Category } from "@/types/category";
 import { useProvider } from "../context";
+import { User } from "@/types/user";
 
 export interface ICategoryComponent {
   cat: Category;
@@ -37,16 +39,19 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
     React.useState<boolean>(false);
   const [taskTitle, setTaskTitle] = React.useState<string>("");
   const [taskDescription, setTaskDescription] = React.useState<string>("");
-  const [taskEndDate, setTaskEndDate] = React.useState<Date>(new Date(0));
+  const [taskEndDate, setTaskEndDate] = React.useState<Date|undefined>(undefined);
   // Edit Category
   const [newTitle, setNewTitle] = React.useState<string>("");
   const [newDescription, setNewDescription] = React.useState<string>("");
   const [newColor, setNewColor] = React.useState<string>("");
+  // Loading
+  const [loading, setLoading] = React.useState<boolean>(false);
   // Alert Dialog
   const [openEdit, setOpenEdit] = React.useState<boolean>(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef(null);
   // Context
+  const { user, setUser } = useProvider();
   // Methods
   const handleSetDate = (e: string) => {
     const date = new Date(e);
@@ -54,8 +59,11 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
   };
 
   const handleCreateTask = async () => {
-   await cat.CreateTask(taskTitle, taskDescription, taskEndDate);
-   setCreateTaskIsOpen(false);
+    setLoading(true);
+    await cat.CreateTask(taskTitle, taskDescription, taskEndDate);
+    clearInputs();
+    setLoading(false);
+    setCreateTaskIsOpen(false);
   };
 
   const handleSaveEditCategory = () => {
@@ -66,6 +74,12 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
     // cats[id].title = newTitle;
     // setCategories(cats);
     // setOpenEdit(false);
+  };
+
+  const clearInputs = () => {
+   setTaskTitle("");
+   setTaskDescription("");
+   setTaskEndDate(undefined);
   };
 
   // Component
@@ -170,9 +184,13 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button variant="primary" onClick={handleCreateTask} ml={3}>
-                Create Task
-              </Button>
+              {!loading ? (
+                <Button variant="primary" onClick={handleCreateTask} ml={3}>
+                  Create Task
+                </Button>
+              ) : (
+                <Spinner />
+              )}
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialogOverlay>
@@ -208,10 +226,7 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
         </HStack>
         {cat.tasks.map((task, idx) => {
           return (
-            <VStack
-              key={idx}
-              w="full"
-            >
+            <VStack key={idx} w="full">
               <TaskComponent task={task} />
             </VStack>
           );

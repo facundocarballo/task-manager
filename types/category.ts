@@ -1,7 +1,7 @@
 import { db } from "@/firebase/config";
 import { COLLECTION_Category, COLLECTION_Task, COLLECTION_TaskCompleted, COLLECTION_TaskDeleted, COLLECTION_USER } from "@/firebase/constants/collections";
 import { DocumentData, doc, setDoc, Timestamp, query, collection, getDocs } from "firebase/firestore";
-import { Task } from "./task";
+import { Task, TaskDates } from "./task";
 
 export class Category {
     uid: string;
@@ -15,44 +15,98 @@ export class Category {
     owner: string;
 
     constructor(
+        uid: string,
+        name: string,
+        description: string,
+        color: string,
+        tasks: Task[],
+        tasksCompleted: Task[],
+        tasksDeleted: Task[],
+        subCategories: Category[],
+        owner: string
+
+    ) {
+        this.uid = uid;
+        this.name = name;
+        this.description = description;
+        this.color = color;
+        this.tasks = tasks;
+        this.tasksCompleted = tasksCompleted;
+        this.tasksDeleted = tasksDeleted;
+        this.subCategories = subCategories;
+        this.owner = owner;
+    }
+
+    // Constructor 2
+    static async CreateCategoryWithTasksToDo(        
         data: DocumentData,
         uid: string,
         owner: string
-    ) {
-        this.uid = uid;
-        this.name = data.name;
-        this.description = data.description;
-        this.color = data.color;
-        this.tasks = [];
-        this.tasksCompleted = [];
-        this.tasksDeleted = [];
-        this.subCategories = [];
-        this.owner = owner;
+    ): Promise<Category> {
 
-        this.GetTasksToDo()
+        const newCategory = new Category(
+            uid,
+            data.name,
+            data.description,
+            data.color,
+            [],
+            [],
+            [],
+            [],
+            owner
+        );
+
+        await newCategory.GetTasksToDo();
+        await newCategory.GetTasksCompleted();
+        await newCategory.GetTasksDeleted();
+        return newCategory;
     }
 
+
     // Tasks
-    async CreateTask(name: string, description: string, mustEnd: Date): Promise<undefined> {
-        const date = new Date(0);
+    async CreateTask(name: string, description: string, mustEnd?: Date): Promise<undefined> {
         try {
-            await setDoc(
-                doc(
-                  db,
-                  COLLECTION_USER + "/" + this.owner + "/" + 
-                  COLLECTION_Category + "/" + this.uid + "/" + 
-                  COLLECTION_Task,
-                  this.tasks.length.toString()
-                ),
-                {
-                  name: name,
-                  description: description,
-                  created: Timestamp.now(),
-                  mustEnd: mustEnd === date ? null : Timestamp.fromDate(mustEnd),
-                  category: this.uid,
-                  owner: this.owner
-                }
+            const ref = doc(
+                collection(
+                    db,
+                    COLLECTION_USER + "/" + this.owner + "/" + 
+                    COLLECTION_Category + "/" + this.uid + "/" + 
+                    COLLECTION_Task
+                )
             );
+            if (mustEnd !== undefined) {
+                await setDoc(ref, {
+                    name: name,
+                    description: description,
+                    created: Timestamp.now(),
+                    mustEnd: Timestamp.fromDate(mustEnd),
+                    category: this.uid,
+                    owner: this.owner
+                });
+            } else {
+                await setDoc(ref, {
+                    name: name,
+                    description: description,
+                    created: Timestamp.now(),
+                    category: this.uid,
+                    owner: this.owner
+                });
+            }
+
+
+            const taskDates: TaskDates = {
+                created: new Date(Date.now()),
+                mustEnd: mustEnd
+            };
+
+            this.tasks.push(new Task(
+                ref.id,
+                name,
+                description,
+                this.uid,
+                this.owner,
+                taskDates
+            ));
         } catch(err) {
             console.error("Error creating task. ", err);
         }
@@ -69,9 +123,19 @@ export class Category {
         );
 
         const querySnapshot = await getDocs(q);
-        querySnapshot.forEach((doc) => {
-            this.tasks.push(new Task(doc.data(), doc.id, this.uid, this.owner));
-        })
+        const docs = querySnapshot.docs;
+        for (let i = 0; i < docs.length; i++) {
+            const data = docs[i].data();
+            const taskDates: TaskDates = Task.GetDatesFromData(data);
+            this.tasks.push(new Task(
+                docs[i].id,
+                data.name,
+                data.description,
+                this.uid,
+                this.owner,
+                taskDates
+            ));
+        }
     }
 
     async GetTasksCompleted(): Promise<undefined> {
@@ -85,9 +149,19 @@ export class Category {
         );
 
         const querySnapshot = await getDocs(q);
-        querySnapshot.forEach((doc) => {
-            this.tasksCompleted.push(new Task(doc.data(), doc.id, this.uid, this.owner));
-        })
+        const docs = querySnapshot.docs;
+        for (let i = 0; i < docs.length; i++) {
+            const data = docs[i].data();
+            const taskDates: TaskDates = Task.GetDatesFromData(data);
+            this.tasksCompleted.push(new Task(
+                docs[i].id,
+                data.name,
+                data.description,
+                this.uid,
+                this.owner,
+                taskDates
+            ));
+        }
     }
 
     async GetTasksDeleted(): Promise<undefined> {
@@ -101,8 +175,18 @@ export class Category {
         );
 
         const querySnapshot = await getDocs(q);
-        querySnapshot.forEach((doc) => {
-            this.tasksDeleted.push(new Task(doc.data(), doc.id, this.uid, this.owner));
-        })
+        const docs = querySnapshot.docs;
+        for (let i = 0; i < docs.length; i++) {
+            const data = docs[i].data();
+            const taskDates: TaskDates = Task.GetDatesFromData(data);
+            this.tasksDeleted.push(new Task(
+                docs[i].id,
+                data.name,
+                data.description,
+                this.uid,
+                this.owner,
+                taskDates
+            ));
+        }
     }
 }

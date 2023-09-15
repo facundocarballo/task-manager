@@ -18,7 +18,7 @@ export const CreateUserForm = () => {
     const auth = getAuth();
     try {
       const res = await signInWithPopup(auth, googleProvider);
-      const user = new User(res.user);
+      const user = await User.CreateUserWithCredential(res.user);
       const credential = GoogleAuthProvider.credentialFromResult(res);
       if (credential === null) {
         console.log("Credential null.");

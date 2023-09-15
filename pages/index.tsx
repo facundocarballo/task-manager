@@ -13,6 +13,8 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   AlertDialogCloseButton,
+  Spinner,
+  Box,
 } from "@chakra-ui/react";
 import { TasksCompleted } from "@/src/subpages/TasksCompleted";
 import { useProvider } from "@/src/context";
@@ -77,13 +79,24 @@ export default function Home() {
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <NavBar />
-        <TheDivider horizontal={true} />
-        <Categories />
-        <TheDivider horizontal={true} />
-        <TasksCompleted />
-        <TheDivider horizontal={true} />
-        <TasksDeleted />
-        <TheDivider horizontal={true} />
+        {user == null ? (
+          <>
+            <Box h='200px' />
+            <Spinner />
+            <Box h='200px' />
+          </>
+          
+        ) : (
+          <>
+            <TheDivider horizontal={true} />
+            <Categories />
+            <TheDivider horizontal={true} />
+            <TasksCompleted />
+            <TheDivider horizontal={true} />
+            <TasksDeleted />
+            <TheDivider horizontal={true} />
+          </>
+        )}
         <Spacer />
         <Footer />
       </VStack>

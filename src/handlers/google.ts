@@ -9,7 +9,8 @@ export const trySiginWithCredential = async ():Promise<User|undefined> => {
         const credential = GoogleAuthProvider.credential(null, token);
         const userCredential = await signInWithCredential(getAuth(), credential);
         const user = userCredential.user;
-        return new User(user);
+        const theUser = await User.CreateUserWithCredential(user);
+        return theUser;
     }catch(err) {
         console.error("Error trying to sigin with credential. ", err);
     }

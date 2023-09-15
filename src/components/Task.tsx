@@ -1,5 +1,5 @@
 import { DeleteIcon, DragHandleIcon, InfoIcon } from '@chakra-ui/icons';
-import { HStack, VStack, Box, Text, useDisclosure, Divider, Button, Spacer } from '@chakra-ui/react';
+import { HStack, VStack, Box, Text, useDisclosure, Divider, Button, Spacer, Spinner } from '@chakra-ui/react';
 import {
     AlertDialog,
     AlertDialogBody,
@@ -13,9 +13,8 @@ import React, { ReactElement } from 'react';
 import { useProvider } from '../context';
 import { TaskInfo } from './TaskInfo';
 import { getStringDate } from '../handlers/date';
-import { deleteTask } from '../handlers/task';
-import { copyCategories } from '../handlers/categories';
 import { Task } from '@/types/task';
+import { User } from '@/types/user';
 
 interface ITaskProps {
     task: Task
@@ -24,12 +23,13 @@ interface ITaskProps {
 export const TaskComponent = ({ task }: ITaskProps) => {
     // Attributes
     const [mouseEnter, setMouseEnter] = React.useState<boolean>(false);
+    const [loading, setLoading] = React.useState<boolean>(false);
     // AlertDialog Attributes
     const { isOpen, onOpen, onClose } = useDisclosure()
     const cancelRef = React.useRef(null)
 
     // Context
-    const { categories, setCategories, tasksCompleted, setTasksCompleted, setTasksDeleted, tasksDeleted } = useProvider();
+    const { user, setUser, categories, setCategories, tasksCompleted, setTasksCompleted, setTasksDeleted, tasksDeleted } = useProvider();
     // Methods
     const handleMouseEnter = () => {
         setMouseEnter(true);
@@ -38,10 +38,28 @@ export const TaskComponent = ({ task }: ITaskProps) => {
         setMouseEnter(false);
     }
     const handleCompleteTask = async () => {
-        await task.Complete()
+        if (user === null) {
+            console.error("User is null.");
+            return
+        }
+        setLoading(true);
+        await task.Complete();
+        setLoading(false);
+        user.DeleteTaskFromTasksToDoToCompleted(task);
+        setUser(new User(user));
     }
+
     const handleDeleteTask = async () => {
-        await task.Delete()
+        if (user === null) {
+            console.error("User is null.");
+            return
+        }
+
+        setLoading(true);
+        await task.Delete();
+        setLoading(false);
+        user.DeleteTaskFromTasksToDoToDeleted(task);
+        setUser(new User(user));
     };
 
     // SubComponents    
@@ -152,6 +170,10 @@ export const TaskComponent = ({ task }: ITaskProps) => {
                     >
                         {task.name}
                     </Text>
+                    <Spacer />
+                    {
+                        loading ? <Spinner /> : null
+                    }
                     <Spacer />
                     {renderInfoBtn()}
                     {renderDeleteBtn()}
