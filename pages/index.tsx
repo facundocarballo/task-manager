@@ -19,24 +19,40 @@ import {
 } from '@chakra-ui/react';
 import { CreateUserForm } from '@/src/components/CreateUserForm';
 import { TasksDeleted } from '@/src/subpages/TasksDeleted';
+import { trySiginWithCredential } from '@/src/handlers/google';
 
+let read:boolean = true
 
 export default function Home() {
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
   const cancelRef = React.useRef(null);
   const onClose = () => setIsOpen(false);
   // Context
-  const { user, categories, setTasksCompleted } = useProvider();
+  const { user, setUser, categories, setTasksCompleted } = useProvider();
   // React Use Effect
   React.useEffect(() => {
+    handleUserEffect();
     if (categories == null) return;
     setTasksCompleted(getAllTaskCompleted(categories));
   }, [])
+
+  const handleUserEffect = async () => {
+    if (!read) return;
+    read = false;
+
+    const user = await trySiginWithCredential();
+    if (user == undefined) {
+      setIsOpen(true);
+      return
+    }
+    setUser(user);
+  }
+
   return (
     <>
 
       <AlertDialog
-        isOpen={user === null}
+        isOpen={isOpen && user === null}
         leastDestructiveRef={cancelRef}
         onClose={onClose}
       >

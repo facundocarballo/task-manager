@@ -1,0 +1,1 @@
+export const USER_TOKEN_KEY = "taskmanager_user_token"

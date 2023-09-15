@@ -3,6 +3,7 @@ import { ITaskManagerContext } from "./interface";
 import { ICategory } from "../components/Category";
 import { DATA_CATEGORIES } from "../data/categories";
 import { ITask } from "../components/Task";
+import { User } from "@/types/user";
 
 // Context Initialization
 const TaskManagerContext = React.createContext<ITaskManagerContext>({
@@ -22,7 +23,7 @@ const TaskManagerContext = React.createContext<ITaskManagerContext>({
 // Context Creation
 export const ContextProvider: React.FC<any> = (props: any) => {
     // React useState variables
-    const [user, setUser] = React.useState<any>(null);
+    const [user, setUser] = React.useState<User|null>(null);
     const [categories, setCategories] = React.useState<ICategory[] | null>(DATA_CATEGORIES);
     const [tasksCompleted, setTasksCompleted] = React.useState<ITask[]>([]);
     const [tasksDeleted, setTasksDeleted] = React.useState<ITask[]>([]);

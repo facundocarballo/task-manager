@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { GoogleAuthProvider, getAuth, signInWithPopup } from "firebase/auth";
 import { googleProvider } from "@/firebase/google";
 import { useProvider } from "../context";
+import { User } from "@/types/user";
 
 // Load all the enviroment variables.
 dotenv.config();
@@ -17,11 +18,20 @@ export const CreateUserForm = () => {
     const auth = getAuth();
     try {
       const res = await signInWithPopup(auth, googleProvider);
+      const user = new User(res.user);
       const credential = GoogleAuthProvider.credentialFromResult(res);
-      const token = credential?.accessToken;
-      const user = res.user;
+      if (credential === null) {
+        console.log("Credential null.");
+        return
+      }
+      const token = credential.accessToken;
+      if (token === undefined) {
+        console.log("Token undefined.");
+        return
+      }
+      user.SaveToken(token);
+
       setUser(user);
-      console.log("user: ", user);
     } catch (err) {
       console.log("Error: ", err);
     }
