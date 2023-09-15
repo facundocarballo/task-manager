@@ -24,7 +24,7 @@ const TaskManagerContext = React.createContext<ITaskManagerContext>({
 export const ContextProvider: React.FC<any> = (props: any) => {
     // React useState variables
     const [user, setUser] = React.useState<User|null>(null);
-    const [categories, setCategories] = React.useState<ICategory[] | null>(DATA_CATEGORIES);
+    const [categories, setCategories] = React.useState<ICategory[] | null>([]); // ANTES DATA_CATEGORY
     const [tasksCompleted, setTasksCompleted] = React.useState<ITask[]>([]);
     const [tasksDeleted, setTasksDeleted] = React.useState<ITask[]>([]);
 

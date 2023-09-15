@@ -1,295 +1,223 @@
-import { DragHandleIcon, EditIcon, InfoIcon } from '@chakra-ui/icons';
-import { Box, Button, HStack, Spacer, Text, VStack, useColorModeValue, useDisclosure } from '@chakra-ui/react';
+import { EditIcon, InfoIcon } from "@chakra-ui/icons";
 import {
-   AlertDialog,
-   AlertDialogBody,
-   AlertDialogFooter,
-   AlertDialogHeader,
-   AlertDialogContent,
-   AlertDialogOverlay,
-   AlertDialogCloseButton,
-} from '@chakra-ui/react'
-import React, { ReactElement } from 'react';
-import { ITask, Task } from './Task';
-import { useProvider } from '../context';
-import { handleDragAndDrop } from '../handlers/dragAndDrop';
-import { copyCategories } from '../handlers/categories';
-import { copyTasks } from '../handlers/task';
-import { InputInfo } from './InputInfo';
-import { CreateCategory } from './CreateCategory';
+  Box,
+  Button,
+  HStack,
+  Spacer,
+  Text,
+  VStack,
+  useColorModeValue,
+  useDisclosure,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  AlertDialogCloseButton,
+} from "@chakra-ui/react";
+import React from "react";
+import { TaskComponent } from "./Task";
+import { InputInfo } from "./InputInfo";
+import { CreateCategory } from "./CreateCategory";
+import { Category } from "@/types/category";
+import { useProvider } from "../context";
 
-
-export interface ICategory {
-   id: number,
-   title: string,
-   description: string,
-   tasks: ITask[],
-   tasksCompleted: ITask[],
-   tasksDeleted: ITask[],
-   color: string,
+export interface ICategoryComponent {
+  cat: Category;
 }
 
-export const Category = ({ title, description, tasks, color, id }: ICategory) => {
-   // Attributes
-   const taskDraggable = React.useRef<any>(null);
-   const taskReplaced = React.useRef<any>(null);
-   const [showDragIcon, setShowDragIcon] = React.useState<boolean>(false);
-   const bgIconsButton = useColorModeValue('light.bg', 'dark.bg');
-   // Create Task
-   const [createTaskIsOpen, setCreateTaskIsOpen] = React.useState<boolean>(false);
-   const [taskTitle, setTaskTitle] = React.useState<string>('');
-   const [taskDescription, setTaskDescription] = React.useState<string>('');
-   const [taskEndDate, setTaskEndDate] = React.useState<Date>(new Date());
-   // Edit Category
-   const [newTitle, setNewTitle] = React.useState<string>('');
-   const [newDescription, setNewDescription] = React.useState<string>('')
-   const [newColor, setNewColor] = React.useState<string>('')
-   // Alert Dialog
-   const [openEdit, setOpenEdit] = React.useState<boolean>(false);
-   const { isOpen, onOpen, onClose } = useDisclosure();
-   const cancelRef = React.useRef(null);
-   // Context
-   const { categories, setCategories } = useProvider();
-   // Methods
+export const CategoryComponent = ({ cat }: ICategoryComponent) => {
+  // Attributes
+  const taskDraggable = React.useRef<any>(null);
+  const taskReplaced = React.useRef<any>(null);
+  const bgIconsButton = useColorModeValue("light.bg", "dark.bg");
+  // Create Task
+  const [createTaskIsOpen, setCreateTaskIsOpen] =
+    React.useState<boolean>(false);
+  const [taskTitle, setTaskTitle] = React.useState<string>("");
+  const [taskDescription, setTaskDescription] = React.useState<string>("");
+  const [taskEndDate, setTaskEndDate] = React.useState<Date>(new Date());
+  // Edit Category
+  const [newTitle, setNewTitle] = React.useState<string>("");
+  const [newDescription, setNewDescription] = React.useState<string>("");
+  const [newColor, setNewColor] = React.useState<string>("");
+  // Alert Dialog
+  const [openEdit, setOpenEdit] = React.useState<boolean>(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = React.useRef(null);
+  // Context
+  // Methods
+  const handleSetDate = (e: string) => {
+    const date = new Date(e);
+    setTaskEndDate(date);
+  };
 
-   const handleDragOnEnd = () => {
-      if (categories == null) return;
-      let cats: ICategory[] = copyCategories(categories);
-      let tasks = handleDragAndDrop(
-         taskDraggable.current,
-         taskReplaced.current,
-         cats[id].tasks
-      );
-      cats[id].tasks = tasks;
-      setCategories(cats);
-   };
+  const handleCreateTask = async () => {
+   await cat.CreateTask(taskTitle, taskDescription, taskEndDate);
+   setCreateTaskIsOpen(false);
+  };
 
-   const handleShowDragIcon = (): ReactElement<any> | null => {
-      if (showDragIcon) {
-         return (
-            <>
-               <Box w='5px' />
-               <DragHandleIcon
-                  cursor='pointer'
-                  _hover={{
-                     shadow: 'lg',
-                     transform: 'scale(1.1)',
-                  }}
-               />
-            </>
-         );
-      }
-      return <>
-         <Box w='30px' />
-      </>;
-   }
+  const handleSaveEditCategory = () => {
+    // if (categories == null) return;
+    // let cats = copyCategories(categories);
+    // cats[id].color = newColor;
+    // cats[id].description = newDescription;
+    // cats[id].title = newTitle;
+    // setCategories(cats);
+    // setOpenEdit(false);
+  };
 
-   const handleMouseEnter = () => {
-      setShowDragIcon(true)
-   }
+  // Component
+  return (
+    <>
+      {/* Alert Dialog - Category Edit */}
+      <AlertDialog
+        isOpen={openEdit}
+        leastDestructiveRef={cancelRef}
+        onClose={() => setOpenEdit(false)}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Edit {cat.name}
+            </AlertDialogHeader>
+            <AlertDialogCloseButton />
 
-   const handleMouseLeave = () => {
-      setShowDragIcon(false)
-   }
+            <AlertDialogBody>
+              <CreateCategory
+                title={newTitle}
+                description={newDescription}
+                color={newColor}
+                setTitle={setNewTitle}
+                setDescription={setNewDescription}
+                setColor={setNewColor}
+              />
+            </AlertDialogBody>
 
-   const handleSetDate = (e: string) => {
-      const date = new Date(e);
-      setTaskEndDate(date);
-   };
+            <AlertDialogFooter>
+              <Button
+                variant="primary"
+                ref={cancelRef}
+                onClick={handleSaveEditCategory}
+              >
+                Save
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
 
-   const handleCreateTask = () => {
-      if (categories == null) return;
-      let cats = copyCategories(categories);
-      const taskId = Math.random() * 100000;
-      let tasks = copyTasks(cats[id].tasks);
+      {/* Alert Dialog - Category Info */}
+      <AlertDialog
+        isOpen={isOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onClose}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              {cat.name}
+            </AlertDialogHeader>
+            <AlertDialogCloseButton />
 
-      tasks.push({
-         title: taskTitle,
-         category_id: id,
-         id: taskId,
-         dateCreated: new Date(),
-         dateMustEnd: taskEndDate,
-         description: description,
-         dateEnded: null
-      });
-      cats[id].tasks = tasks;
-      setCategories(cats);
-      setCreateTaskIsOpen(false);
-   }
+            <AlertDialogBody>{cat.description}</AlertDialogBody>
 
-   const handleSaveEditCategory = () => {
-      if (categories == null) return;
-      let cats = copyCategories(categories);
-      cats[id].color = newColor;
-      cats[id].description = newDescription;
-      cats[id].title = newTitle;
-      setCategories(cats);
-      setOpenEdit(false);
-   };
+            <AlertDialogFooter>
+              <Button variant="primary" ref={cancelRef} onClick={onClose}>
+                OK
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
 
-   // Component
-   return (
-      <>
-         {/* Alert Dialog - Category Edit */}
-         <AlertDialog
-            isOpen={openEdit}
-            leastDestructiveRef={cancelRef}
-            onClose={() => setOpenEdit(false)}
-         >
-            <AlertDialogOverlay>
-               <AlertDialogContent>
-                  <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                     Edit {title}
-                  </AlertDialogHeader>
-                  <AlertDialogCloseButton />
+      {/* Alert Dialog - Create Task */}
+      <AlertDialog
+        isOpen={createTaskIsOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={() => setCreateTaskIsOpen(false)}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Create Task
+            </AlertDialogHeader>
+            <AlertDialogCloseButton />
 
-                  <AlertDialogBody>
-                     <CreateCategory
-                        title={newTitle}
-                        description={newDescription}
-                        color={newColor}
-                        setTitle={setNewTitle}
-                        setDescription={setNewDescription}
-                        setColor={setNewColor}
-                     />
-                  </AlertDialogBody>
+            <AlertDialogBody>
+              <InputInfo
+                title="Title"
+                placeholder="Task Title"
+                value={taskTitle}
+                type="text"
+                handler={setTaskTitle}
+              />
+              <InputInfo
+                title="Description"
+                placeholder="Task Description"
+                value={taskDescription}
+                type="text"
+                handler={setTaskDescription}
+              />
+              <InputInfo
+                value={undefined}
+                title="Deadline"
+                placeholder="Task Deadline"
+                type="datetime-local"
+                handler={handleSetDate}
+              />
+            </AlertDialogBody>
 
-                  <AlertDialogFooter>
-                     <Button variant='primary' ref={cancelRef} onClick={handleSaveEditCategory}>
-                        Save
-                     </Button>
-                  </AlertDialogFooter>
-               </AlertDialogContent>
-            </AlertDialogOverlay>
-         </AlertDialog>
+            <AlertDialogFooter>
+              <Button variant="primary" onClick={handleCreateTask} ml={3}>
+                Create Task
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
 
-         {/* Alert Dialog - Category Info */}
-         <AlertDialog
-            isOpen={isOpen}
-            leastDestructiveRef={cancelRef}
-            onClose={onClose}
-         >
-            <AlertDialogOverlay>
-               <AlertDialogContent>
-                  <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                     {title}
-                  </AlertDialogHeader>
-                  <AlertDialogCloseButton />
-
-                  <AlertDialogBody>
-                     {description}
-                  </AlertDialogBody>
-
-                  <AlertDialogFooter>
-                     <Button variant='primary' ref={cancelRef} onClick={onClose}>
-                        OK
-                     </Button>
-                  </AlertDialogFooter>
-               </AlertDialogContent>
-            </AlertDialogOverlay>
-         </AlertDialog>
-
-         {/* Alert Dialog - Create Task */}
-         <AlertDialog
-            isOpen={createTaskIsOpen}
-            leastDestructiveRef={cancelRef}
-            onClose={() => setCreateTaskIsOpen(false)}
-         >
-            <AlertDialogOverlay>
-               <AlertDialogContent>
-                  <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                     Create Task
-                  </AlertDialogHeader>
-                  <AlertDialogCloseButton />
-
-                  <AlertDialogBody>
-                     <InputInfo
-                        title='Title'
-                        placeholder='Task Title'
-                        value={taskTitle}
-                        type='text'
-                        handler={setTaskTitle}
-                     />
-                     <InputInfo
-                        title='Description'
-                        placeholder='Task Description'
-                        value={taskDescription}
-                        type='text'
-                        handler={setTaskDescription}
-                     />
-                     <InputInfo
-                        value={undefined}
-                        title='Deadline'
-                        placeholder="Task Deadline"
-                        type='datetime-local'
-                        handler={handleSetDate}
-                     />
-                  </AlertDialogBody>
-
-                  <AlertDialogFooter>
-                     <Button variant='primary' onClick={handleCreateTask} ml={3}>
-                        Create Task
-                     </Button>
-                  </AlertDialogFooter>
-               </AlertDialogContent>
-            </AlertDialogOverlay>
-         </AlertDialog>
-
-         <VStack
-            minH='400px'
-            maxH='400px'
-            minW='600px'
-            maxW='600px'
-            borderRadius='10px'
-            overflowY='scroll'
-         >
-            <HStack
-               w='full'
-               onMouseEnter={handleMouseEnter}
-               onMouseLeave={handleMouseLeave}
+      <VStack
+        minH="400px"
+        maxH="400px"
+        minW="600px"
+        maxW="600px"
+        borderRadius="10px"
+        overflowY="scroll"
+      >
+        <HStack w="full">
+          <Box w="10px" />
+          <Text fontSize="30px" fontWeight="bold">
+            {cat.name}
+          </Text>
+          <Spacer />
+          <Button
+            variant="info"
+            bg={bgIconsButton}
+            onClick={() => setCreateTaskIsOpen(true)}
+          >
+            <EditIcon />
+          </Button>
+          <Button variant="info" bg={bgIconsButton} onClick={onOpen}>
+            <InfoIcon />
+          </Button>
+          <Button variant="secundary" onClick={() => setOpenEdit(true)}>
+            Edit
+          </Button>
+        </HStack>
+        {cat.tasks.map((task, idx) => {
+          return (
+            <VStack
+              key={idx}
+              w="full"
             >
-               {handleShowDragIcon()}
-               <Box w='10px' />
-               <Text
-                  fontSize='30px'
-                  fontWeight='bold'
-               >
-                  {title}
-               </Text>
-               <Spacer />
-               <Button variant='info' bg={bgIconsButton} onClick={() => setCreateTaskIsOpen(true)}>
-                  <EditIcon />
-               </Button>
-               <Button variant='info' bg={bgIconsButton} onClick={onOpen}>
-                  <InfoIcon />
-               </Button>
-               <Button variant='secundary' onClick={() => setOpenEdit(true)}>
-                  Edit
-               </Button>
-            </HStack>
-            {
-               tasks.map((task, idx) => {
-                  return (
-                     <VStack
-                        w='full'
-                        draggable
-                        onDragStart={() => {
-                           taskDraggable.current = idx
-                        }}
-                        onDragEnter={() => {
-                           taskReplaced.current = idx;
-                        }}
-                        onDragEnd={handleDragOnEnd}
-                     >
-                        <Task
-                           task={task}
-                        />
-                     </VStack>
-                  )
-               })
-            }
-            <Spacer />
-         </VStack>
-      </>
-   );
-}
+              <TaskComponent task={task} />
+            </VStack>
+          );
+        })}
+        <Spacer />
+      </VStack>
+    </>
+  );
+};

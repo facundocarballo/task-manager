@@ -15,22 +15,13 @@ import { TaskInfo } from './TaskInfo';
 import { getStringDate } from '../handlers/date';
 import { deleteTask } from '../handlers/task';
 import { copyCategories } from '../handlers/categories';
-
-export interface ITask {
-    title: string,
-    id: number,
-    category_id: number,
-    dateCreated: Date,
-    dateMustEnd: Date | null,
-    dateEnded: Date | null,
-    description: string | null
-}
+import { Task } from '@/types/task';
 
 interface ITaskProps {
-    task: ITask
+    task: Task
 }
 
-export const Task = ({ task }: ITaskProps) => {
+export const TaskComponent = ({ task }: ITaskProps) => {
     // Attributes
     const [mouseEnter, setMouseEnter] = React.useState<boolean>(false);
     // AlertDialog Attributes
@@ -47,26 +38,26 @@ export const Task = ({ task }: ITaskProps) => {
         setMouseEnter(false);
     }
     const handleCompleteTask = () => {
-        if (categories == null) return;
-        let cats = copyCategories(categories);
-        const tasks = deleteTask(task, cats[task.category_id].tasks);
-        cats[task.category_id].tasks = tasks;
-        task.dateEnded = new Date();
-        cats[task.category_id].tasksCompleted.push(task);
+        // if (categories == null) return;
+        // let cats = copyCategories(categories);
+        // const tasks = deleteTask(task, cats[task.category_id].tasks);
+        // cats[task.category_id].tasks = tasks;
+        // task.dateEnded = new Date();
+        // cats[task.category_id].tasksCompleted.push(task);
 
-        setCategories(cats);
-        setTasksCompleted([...tasksCompleted, task])
+        // setCategories(cats);
+        // setTasksCompleted([...tasksCompleted, task])
     }
     const handleDeleteTask = () => {
-        if (categories == null) return;
-        let cats = copyCategories(categories);
-        const tasks = deleteTask(task, cats[task.category_id].tasks);
-        cats[task.category_id].tasks = tasks;
-        task.dateEnded = new Date();
-        cats[task.category_id].tasksDeleted.push(task);
+        // if (categories == null) return;
+        // let cats = copyCategories(categories);
+        // const tasks = deleteTask(task, cats[task.category_id].tasks);
+        // cats[task.category_id].tasks = tasks;
+        // task.dateEnded = new Date();
+        // cats[task.category_id].tasksDeleted.push(task);
 
-        setCategories(cats);
-        setTasksDeleted([...tasksDeleted, task])
+        // setCategories(cats);
+        // setTasksDeleted([...tasksDeleted, task])
     };
 
     // SubComponents    
@@ -128,7 +119,7 @@ export const Task = ({ task }: ITaskProps) => {
                 <AlertDialogOverlay>
                     <AlertDialogContent>
                         <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                            {task.title}
+                            {task.name}
                         </AlertDialogHeader>
                         <AlertDialogCloseButton />
 
@@ -139,11 +130,11 @@ export const Task = ({ task }: ITaskProps) => {
                             />
                             <TaskInfo
                                 title="Date Created"
-                                value={getStringDate(task.dateCreated)}
+                                value={getStringDate(task.dates.created)}
                             />
                             <TaskInfo
                                 title="Date Must End"
-                                value={getStringDate(task.dateMustEnd)}
+                                value={getStringDate(task.dates.mustEnd)}
                             />
 
                         </AlertDialogBody>
@@ -175,7 +166,7 @@ export const Task = ({ task }: ITaskProps) => {
                     />
                     <Text
                     >
-                        {task.title}
+                        {task.name}
                     </Text>
                     <Spacer />
                     {renderInfoBtn()}

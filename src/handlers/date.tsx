@@ -1,5 +1,5 @@
-export const getStringDate = (date: Date|null): string => {
-    if (date == null ) return "Doesn't have Date to End."
+export const getStringDate = (date: Date|undefined): string => {
+    if (date == undefined ) return "Doesn't have Date to End."
     const year = date.getFullYear()
     let month = checkCorrectDateString(`${date.getMonth() + 1}`);
     let day = checkCorrectDateString(`${date.getDate()}`);

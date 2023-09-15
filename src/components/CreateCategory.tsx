@@ -1,9 +1,7 @@
 import {
-  Box,
   HStack,
   Input,
   Text,
-  InputLeftAddon,
   Spacer,
   VStack,
 } from "@chakra-ui/react";
@@ -53,7 +51,6 @@ export const CreateCategory = ({
             color={color}
             width="full"
             onChange={(c, _) => setColor(c.hex)}
-            onChangeComplete={(c, _) => console.log("Color: ", color)}
           />
       </VStack>
     </>

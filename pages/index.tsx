@@ -1,27 +1,27 @@
-import Head from 'next/head';
-import React from 'react';
-import { NavBar } from '@/src/components/NavBar';
-import { TheDivider } from '@/src/components/TheDivider';
-import { Categories } from '@/src/subpages/Categories';
-import { Footer } from '@/src/subpages/Footer';
-import { Spacer, VStack } from '@chakra-ui/react';
-import { TasksCompleted } from '@/src/subpages/TasksCompleted';
-import { useProvider } from '@/src/context';
-import { getAllTaskCompleted } from '@/src/handlers/task';
+import Head from "next/head";
+import React from "react";
+import { NavBar } from "@/src/components/NavBar";
+import { TheDivider } from "@/src/components/TheDivider";
+import { Categories } from "@/src/subpages/Categories";
+import { Footer } from "@/src/subpages/Footer";
 import {
+  Spacer,
+  VStack,
   AlertDialog,
   AlertDialogBody,
-  AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogContent,
   AlertDialogOverlay,
   AlertDialogCloseButton,
-} from '@chakra-ui/react';
-import { CreateUserForm } from '@/src/components/CreateUserForm';
-import { TasksDeleted } from '@/src/subpages/TasksDeleted';
-import { trySiginWithCredential } from '@/src/handlers/google';
+} from "@chakra-ui/react";
+import { TasksCompleted } from "@/src/subpages/TasksCompleted";
+import { useProvider } from "@/src/context";
+import { getAllTaskCompleted } from "@/src/handlers/task";
+import { CreateUserForm } from "@/src/components/CreateUserForm";
+import { TasksDeleted } from "@/src/subpages/TasksDeleted";
+import { trySiginWithCredential } from "@/src/handlers/google";
 
-let read:boolean = true
+let read: boolean = true;
 
 export default function Home() {
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
@@ -34,7 +34,7 @@ export default function Home() {
     handleUserEffect();
     if (categories == null) return;
     setTasksCompleted(getAllTaskCompleted(categories));
-  }, [])
+  }, []);
 
   const handleUserEffect = async () => {
     if (!read) return;
@@ -43,14 +43,13 @@ export default function Home() {
     const user = await trySiginWithCredential();
     if (user == undefined) {
       setIsOpen(true);
-      return
+      return;
     }
     setUser(user);
-  }
+  };
 
   return (
     <>
-
       <AlertDialog
         isOpen={isOpen && user === null}
         leastDestructiveRef={cancelRef}
@@ -58,7 +57,7 @@ export default function Home() {
       >
         <AlertDialogOverlay>
           <AlertDialogContent>
-            <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
               Create a new User
             </AlertDialogHeader>
             <AlertDialogCloseButton />
@@ -66,12 +65,11 @@ export default function Home() {
             <AlertDialogBody>
               <CreateUserForm />
             </AlertDialogBody>
-
           </AlertDialogContent>
         </AlertDialogOverlay>
       </AlertDialog>
 
-      <VStack minH='100%'>
+      <VStack minH="100%">
         <Head>
           <title>Task Manager</title>
           <meta name="description" content="App to handle all of your tasks." />
@@ -90,5 +88,5 @@ export default function Home() {
         <Footer />
       </VStack>
     </>
-  )
+  );
 }
