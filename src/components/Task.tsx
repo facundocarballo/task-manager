@@ -37,27 +37,11 @@ export const TaskComponent = ({ task }: ITaskProps) => {
     const handleMouseLeave = () => {
         setMouseEnter(false);
     }
-    const handleCompleteTask = () => {
-        // if (categories == null) return;
-        // let cats = copyCategories(categories);
-        // const tasks = deleteTask(task, cats[task.category_id].tasks);
-        // cats[task.category_id].tasks = tasks;
-        // task.dateEnded = new Date();
-        // cats[task.category_id].tasksCompleted.push(task);
-
-        // setCategories(cats);
-        // setTasksCompleted([...tasksCompleted, task])
+    const handleCompleteTask = async () => {
+        await task.Complete()
     }
-    const handleDeleteTask = () => {
-        // if (categories == null) return;
-        // let cats = copyCategories(categories);
-        // const tasks = deleteTask(task, cats[task.category_id].tasks);
-        // cats[task.category_id].tasks = tasks;
-        // task.dateEnded = new Date();
-        // cats[task.category_id].tasksDeleted.push(task);
-
-        // setCategories(cats);
-        // setTasksDeleted([...tasksDeleted, task])
+    const handleDeleteTask = async () => {
+        await task.Delete()
     };
 
     // SubComponents    

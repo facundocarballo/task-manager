@@ -34,6 +34,7 @@ export class Category {
 
     // Tasks
     async CreateTask(name: string, description: string, mustEnd: Date): Promise<undefined> {
+        const date = new Date(0);
         try {
             await setDoc(
                 doc(
@@ -47,7 +48,7 @@ export class Category {
                   name: name,
                   description: description,
                   created: Timestamp.now(),
-                  mustEnd: Timestamp.fromDate(mustEnd),
+                  mustEnd: mustEnd === date ? null : Timestamp.fromDate(mustEnd),
                   category: this.uid,
                   owner: this.owner
                 }

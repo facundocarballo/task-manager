@@ -1,4 +1,6 @@
-import { DocumentData } from "firebase/firestore";
+import { db } from "@/firebase/config";
+import { COLLECTION_Category, COLLECTION_Task, COLLECTION_TaskCompleted, COLLECTION_TaskDeleted, COLLECTION_USER } from "@/firebase/constants/collections";
+import { DocumentData, Timestamp, deleteDoc, doc, setDoc } from "firebase/firestore";
 
 export interface TaskDates {
     created: Date,
@@ -47,5 +49,75 @@ export class Task {
             finished,
             deleted
         }
+    }
+
+    private async _Delete(): Promise<undefined> {
+        try {
+            await deleteDoc(
+                doc(
+                    db,
+                    COLLECTION_USER + "/" + this.owner + "/" + 
+                    COLLECTION_Category + "/" + this.category + "/" + 
+                    COLLECTION_Task,
+                    this.uid
+                )
+            )
+        }catch(err) {
+            console.error("Error deleting task completed. ", err);
+        }
+    }
+
+    async Complete(): Promise<undefined> {
+        try {
+            await setDoc(
+                doc(
+                  db,
+                  COLLECTION_USER + "/" + this.owner + "/" + 
+                  COLLECTION_Category + "/" + this.category + "/" + 
+                  COLLECTION_TaskCompleted,
+                  this.uid
+                ),
+                {
+                  name: this.name,
+                  description: this.description,
+                  finished: Timestamp.now(),
+                  created: Timestamp.fromDate(this.dates.created),
+                  mustEnd: this.dates.mustEnd === undefined ? null : Timestamp.fromDate(this.dates.mustEnd),
+                  category: this.uid,
+                  owner: this.owner
+                }
+            );
+        } catch(err) {
+            console.error("Error completing task. ", err);
+        }
+
+        await this._Delete()
+    }
+
+    async Delete(): Promise<undefined> {
+        try {
+            await setDoc(
+                doc(
+                  db,
+                  COLLECTION_USER + "/" + this.owner + "/" + 
+                  COLLECTION_Category + "/" + this.category + "/" + 
+                  COLLECTION_TaskDeleted,
+                  this.uid
+                ),
+                {
+                  name: this.name,
+                  description: this.description,
+                  deleted: Timestamp.now(),
+                  created: Timestamp.fromDate(this.dates.created),
+                  mustEnd: this.dates.mustEnd === undefined ? null : Timestamp.fromDate(this.dates.mustEnd),
+                  category: this.uid,
+                  owner: this.owner
+                }
+            );
+        } catch(err) {
+            console.error("Error completing task. ", err);
+        }
+
+        await this._Delete()
     }
 }

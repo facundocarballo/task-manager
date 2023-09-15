@@ -37,7 +37,7 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
     React.useState<boolean>(false);
   const [taskTitle, setTaskTitle] = React.useState<string>("");
   const [taskDescription, setTaskDescription] = React.useState<string>("");
-  const [taskEndDate, setTaskEndDate] = React.useState<Date>(new Date());
+  const [taskEndDate, setTaskEndDate] = React.useState<Date>(new Date(0));
   // Edit Category
   const [newTitle, setNewTitle] = React.useState<string>("");
   const [newDescription, setNewDescription] = React.useState<string>("");
