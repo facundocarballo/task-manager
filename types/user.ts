@@ -116,6 +116,22 @@ export class User {
         }
     }
 
+    EditCategory(
+        name: string, 
+        description: string, 
+        color: string, 
+        catId: string
+    ): undefined {
+        for (let i = 0; i < this.categories.length; i++) {
+            if (this.categories[i].uid === catId) {
+                this.categories[i].name = name;
+                this.categories[i].description = description;
+                this.categories[i].color = color;
+                break;
+            }
+        }
+    }
+
     // Tasks
     GetAllTasksCompleted(): undefined {
         for (const cat of this.categories) {

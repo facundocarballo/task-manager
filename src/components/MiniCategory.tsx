@@ -14,7 +14,6 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { CategoryComponent } from "./Category";
-import { getNumberOfTasks } from "../handlers/task";
 import { Category } from "@/types/category";
 
 export interface IMiniCategory {

@@ -36,6 +36,15 @@ export class Category {
         this.owner = owner;
     }
 
+    private _DeleteTasksToDo(): boolean {
+
+        // Tasks to do
+        for (const t of this.tasks) {
+        }
+
+        return true;
+    }
+
     // Constructor 2
     static async CreateCategoryWithTasksToDo(        
         data: DocumentData,
@@ -61,6 +70,25 @@ export class Category {
         return newCategory;
     }
 
+    async Edit(name: string, description: string, color: string): Promise<undefined> {
+        try {
+            const ref = doc(
+                db,
+                COLLECTION_USER + "/" + this.owner + "/" +
+                COLLECTION_Category,
+                this.uid
+            );
+
+            await setDoc(ref, {
+                name: name,
+                description: description,
+                color: color,
+            });
+            
+        } catch (err) {
+            console.error("Error editing the category. ", err);
+        }
+    }
 
     // Tasks
     async CreateTask(name: string, description: string, mustEnd?: Date): Promise<undefined> {

@@ -39,7 +39,9 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
     React.useState<boolean>(false);
   const [taskTitle, setTaskTitle] = React.useState<string>("");
   const [taskDescription, setTaskDescription] = React.useState<string>("");
-  const [taskEndDate, setTaskEndDate] = React.useState<Date|undefined>(undefined);
+  const [taskEndDate, setTaskEndDate] = React.useState<Date | undefined>(
+    undefined
+  );
   // Edit Category
   const [newTitle, setNewTitle] = React.useState<string>("");
   const [newDescription, setNewDescription] = React.useState<string>("");
@@ -66,20 +68,29 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
     setCreateTaskIsOpen(false);
   };
 
-  const handleSaveEditCategory = () => {
-    // if (categories == null) return;
-    // let cats = copyCategories(categories);
-    // cats[id].color = newColor;
-    // cats[id].description = newDescription;
-    // cats[id].title = newTitle;
-    // setCategories(cats);
-    // setOpenEdit(false);
+  const handleSaveEditCategory = async () => {
+    if (user === null) {
+      console.error("User is null");
+      return;
+    }
+
+    setLoading(true);
+    await cat.Edit(newTitle, newDescription, newColor);
+    setLoading(false);
+    clearInputs();
+    user.EditCategory(newTitle, newDescription, newColor, cat.uid);
+    setUser(new User(user));
+    setOpenEdit(false);
   };
 
   const clearInputs = () => {
-   setTaskTitle("");
-   setTaskDescription("");
-   setTaskEndDate(undefined);
+    setTaskTitle("");
+    setTaskDescription("");
+    setTaskEndDate(undefined);
+
+    setNewColor("");
+    setNewDescription("");
+    setNewTitle("");
   };
 
   // Component
@@ -110,13 +121,17 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button
-                variant="primary"
-                ref={cancelRef}
-                onClick={handleSaveEditCategory}
-              >
-                Save
-              </Button>
+              {loading ? (
+                <Spinner />
+              ) : (
+                <Button
+                  variant="primary"
+                  ref={cancelRef}
+                  onClick={handleSaveEditCategory}
+                >
+                  Save
+                </Button>
+              )}
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialogOverlay>
