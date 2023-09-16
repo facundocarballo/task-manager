@@ -18,7 +18,6 @@ import {
 } from "@chakra-ui/react";
 import { TasksCompleted } from "@/src/subpages/TasksCompleted";
 import { useProvider } from "@/src/context";
-import { getAllTaskCompleted } from "@/src/handlers/task";
 import { CreateUserForm } from "@/src/components/CreateUserForm";
 import { TasksDeleted } from "@/src/subpages/TasksDeleted";
 import { trySiginWithCredential } from "@/src/handlers/google";
@@ -30,7 +29,7 @@ export default function Home() {
   const cancelRef = React.useRef(null);
   const onClose = () => setIsOpen(false);
   // Context
-  const { user, setUser } = useProvider();
+  const { user, setUser, setTasksCompleted, setTasksDeleted } = useProvider();
   // React Use Effect
   React.useEffect(() => {
     handleUserEffect();
@@ -45,6 +44,8 @@ export default function Home() {
       setIsOpen(true);
       return;
     }
+    setTasksCompleted(user.tasksCompleted);
+    setTasksDeleted(user.tasksDeleted);
     setUser(user);
   };
 

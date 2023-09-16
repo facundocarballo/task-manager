@@ -38,7 +38,7 @@ export const TaskComponent = ({ task }: ITaskProps) => {
   const cancelRef = React.useRef(null);
 
   // Context
-  const { user, setUser, setTasksCompleted, setTasksDeleted } = useProvider();
+  const { user, setUser } = useProvider();
   // Methods
   const handleMouseEnter = () => {
     setMouseEnter(true);
@@ -57,7 +57,6 @@ export const TaskComponent = ({ task }: ITaskProps) => {
     await task.Complete();
     setLoading(false);
     user.DeleteTaskFromTasksToDoToCompleted(task);
-    setTasksCompleted(user.tasksCompleted);
     setUser(new User(user));
   };
 
@@ -72,7 +71,6 @@ export const TaskComponent = ({ task }: ITaskProps) => {
     setLoading(false);
     user.DeleteTaskFromTasksToDoToDeleted(task);
     setUser(new User(user));
-    setTasksDeleted(user.tasksDeleted);
   };
 
   // SubComponents

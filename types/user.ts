@@ -132,6 +132,14 @@ export class User {
         }
     }
 
+    GetCategoryFromName(name: string): Category|undefined {
+        for (const cat of this.categories) {
+            if (cat.name === name) {
+                return cat;
+            }
+        }
+    }
+
     // Tasks
     GetAllTasksCompleted(): undefined {
         for (const cat of this.categories) {

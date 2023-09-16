@@ -34,23 +34,18 @@ import { useProvider } from "../context";
 import { getStringDate } from "../handlers/date";
 import { FilterItem } from "../components/FilterItem";
 import { FilterDate, Handler, SetFunc } from "../components/FilterDate";
-import { getCategoryIdFromName } from "../handlers/categories";
-import {
-  getAllTaskDeleted,
-  getTaskFilterByCategory,
-  getTaskFilterByDate,
-} from "../handlers/task";
+import { Task } from "@/types/task";
 
 export const TasksDeleted = () => {
   // Attributes
   const [categoryName, setCategoryName] = React.useState<string>("Default");
-  const [firstDate, setFirstDate] = React.useState<Date | null>(null);
-  const [endDate, setEndDate] = React.useState<Date | null>(null);
+  const [firstDate, setFirstDate] = React.useState<Date|undefined>(undefined);
+  const [endDate, setEndDate] = React.useState<Date>(new Date(Date.now()));
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef(null);
   // Context
-  const { user } = useProvider();
+  const { user, tasksDeleted, setTasksDeleted } = useProvider();
   // Methods
   const getCategories = (): string[] => {
     if (user == null) return [];
@@ -67,27 +62,46 @@ export const TasksDeleted = () => {
   };
   
   const filterData = () => {
-    // if (categories == null) return;
+    if (user == null) return;
+    const cat = user.GetCategoryFromName(categoryName);
+    let fileteredTasks: Task[] = [];
 
-    // const categoryId = getCategoryIdFromName(categoryName, categories);
+    if (cat === undefined) {
+      // Es default.
+      if(firstDate === undefined) {
+        setTasksDeleted(user.tasksDeleted);
+        onClose();
+        return
+      }
 
-    // const allTasksDeleted = getAllTaskDeleted(categories);
+      fileteredTasks = Task.FilterTasksByDates(user.tasksDeleted, firstDate, endDate, false);
+  
+      onClose();
+      setTasksDeleted(fileteredTasks);
+      clearInputs();
+      return
+    }
 
-    // const tasksFilterByCategory = getTaskFilterByCategory(
-    //   allTasksDeleted,
-    //   categoryId
-    // );
+    if(firstDate === undefined) {
+      setTasksDeleted(cat.tasksDeleted);
+      onClose();
+      clearInputs();
+      return
+    }
+    
+    fileteredTasks = Task.FilterTasksByDates(cat.tasksDeleted, firstDate, endDate, false);
 
-    // const tasksFilterByDate = getTaskFilterByDate(
-    //   tasksFilterByCategory,
-    //   firstDate,
-    //   endDate
-    // );
-
-    // onClose();
-    // setTasksDeleted(tasksFilterByDate);
-    // return;
+    setTasksDeleted(fileteredTasks);
+    onClose();
+    clearInputs();
   };
+
+  const clearInputs = () => {
+    setCategoryName("Default");
+    setFirstDate(undefined);
+    setEndDate(new Date(Date.now()))
+  };
+
   // Component
   return (
     <>
@@ -111,7 +125,7 @@ export const TasksDeleted = () => {
                 setSelected={setCategoryName}
               />
               <FilterDate
-                title="Date"
+                title="Date (Ended)"
                 values={[undefined, undefined]}
                 handler={handleSetDate}
                 setFuncs={[setFirstDate, setEndDate]}
@@ -133,8 +147,8 @@ export const TasksDeleted = () => {
               <AccordionButton>
                 <Box as="span" flex="1" textAlign="left">
                   <Heading>
-                    {user.tasksDeleted.length} Task
-                    {user.tasksDeleted.length > 1 ? "s" : null} Deleted
+                    {tasksDeleted.length} Task
+                    {tasksDeleted.length > 1 ? "s" : null} Deleted
                   </Heading>
                 </Box>
                 <AccordionIcon />
@@ -159,7 +173,7 @@ export const TasksDeleted = () => {
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {user.tasksDeleted.map((task, idx) => (
+                        {tasksDeleted.map((task, idx) => (
                           <Tr key={idx}>
                             <Td>{task.name}</Td>
                             <Td>{getStringDate(task.dates.created)}</Td>

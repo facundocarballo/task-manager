@@ -33,28 +33,22 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { useProvider } from "../context";
-import {
-  getAllTaskCompleted,
-  getTaskFilterByAccomplishTime,
-  getTaskFilterByCategory,
-  getTaskFilterByDate,
-} from "../handlers/task";
 import { getStringDate } from "../handlers/date";
 import { FilterItem } from "../components/FilterItem";
-import { getCategoryIdFromName } from "../handlers/categories";
 import { FilterDate, Handler, SetFunc } from "../components/FilterDate";
+import { Task } from "@/types/task";
 
 export const TasksCompleted = () => {
   // Attributes
   const [accomplishTime, setAccomplishTime] = React.useState<string>("Default");
   const [categoryName, setCategoryName] = React.useState<string>("Default");
-  const [firstDate, setFirstDate] = React.useState<Date | null>(null);
-  const [endDate, setEndDate] = React.useState<Date | null>(new Date());
+  const [firstDate, setFirstDate] = React.useState<Date | undefined>(undefined);
+  const [endDate, setEndDate] = React.useState<Date>(new Date(Date.now()));
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef(null);
 
   // Context
-  const { user } = useProvider();
+  const { user, tasksCompleted, setTasksCompleted } = useProvider();
 
   // Methods
   const showCorrectIcon = (
@@ -83,30 +77,36 @@ export const TasksCompleted = () => {
 
   const filterData = () => {
     if (user == null) return;
+    const cat = user.GetCategoryFromName(categoryName);
+    let fileteredTasks: Task[] = [];
 
-    // const categoryId = getCategoryIdFromName(categoryName, categories);
+    if (cat === undefined) {
+      // Es default.
+      fileteredTasks = Task.FilterTasksByAccomplishTime(user.tasksCompleted, accomplishTime);
+      if(firstDate !== undefined)
+        fileteredTasks = Task.FilterTasksByDates(fileteredTasks, firstDate, endDate, true);
+  
+      onClose();
+      setTasksCompleted(fileteredTasks);
+      clearInputs();
+      return
+    }
 
-    // const allTasksCompleted = getAllTaskCompleted(categories);
+    // Category selected (use tasks completed of the category)
+    fileteredTasks = Task.FilterTasksByAccomplishTime(cat.tasksCompleted, accomplishTime);
+    if(firstDate !== undefined)
+      fileteredTasks = Task.FilterTasksByDates(fileteredTasks, firstDate, endDate, true);
 
-    // const tasksFilterByAccomplishTime = getTaskFilterByAccomplishTime(
-    //   allTasksCompleted,
-    //   accomplishTime
-    // );
+    onClose();
+    setTasksCompleted(fileteredTasks);
+    clearInputs();
+  };
 
-    // const tasksFilterByCategory = getTaskFilterByCategory(
-    //   tasksFilterByAccomplishTime,
-    //   categoryId
-    // );
-
-    // const tasksFilterByDate = getTaskFilterByDate(
-    //   tasksFilterByCategory,
-    //   firstDate,
-    //   endDate
-    // );
-
-    // onClose();
-    // setTasksCompleted(tasksFilterByDate);
-    return;
+  const clearInputs = () => {
+    setAccomplishTime("Default");
+    setCategoryName("Default");
+    setFirstDate(undefined);
+    setEndDate(new Date(Date.now()))
   };
 
   // Component
@@ -142,7 +142,7 @@ export const TasksCompleted = () => {
                     setSelected={setCategoryName}
                   />
                   <FilterDate
-                    title="Date"
+                    title="Date (Ended)"
                     values={[undefined, undefined]}
                     handler={handleSetDate}
                     setFuncs={[setFirstDate, setEndDate]}
@@ -162,8 +162,8 @@ export const TasksCompleted = () => {
               <AccordionButton>
                 <Box as="span" flex="1" textAlign="left">
                   <Heading>
-                    {user.tasksCompleted.length} Task
-                    {user.tasksCompleted.length > 1 ? "s" : null} Completed
+                    {tasksCompleted.length} Task
+                    {tasksCompleted.length > 1 ? "s" : null} Completed
                   </Heading>
                 </Box>
                 <AccordionIcon />
@@ -189,7 +189,7 @@ export const TasksCompleted = () => {
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {user.tasksCompleted.map((task, idx) => (
+                        {tasksCompleted.map((task, idx) => (
                           <Tr key={idx}>
                             <Td>{task.name}</Td>
                             <Td>{getStringDate(task.dates.created)}</Td>

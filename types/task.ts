@@ -36,25 +36,32 @@ export class Task {
         this.dates = dates;
         this.categoryName = categoryName;
     }
+    
+    IsAccomplishTime = (): boolean => {
+        if (this.dates.finished === undefined) return false;
+        if (this.dates.mustEnd === undefined) return true;
+        if (
+            this.dates.finished.getTime() < 
+            this.dates.mustEnd.getTime()
+        ) return true;
+    
+        return false;
+    }
 
-    static GetDatesFromData(data: DocumentData): TaskDates {
-        let mustEnd = undefined;
-        let finished = undefined;
-        let deleted = undefined;
-        const created = data.created.toDate();
-        if (data.mustEnd !== undefined) 
-            mustEnd = data.mustEnd.toDate(); 
-        if (data.finished !== undefined)
-            finished = data.finished.toDate();
-        if (data.deleted !== undefined)
-            deleted = data.deleted.toDate();
-
-        return {
-            created,
-            mustEnd,
-            finished,
-            deleted
+    FitInDates = (firstDate: Date, endDate: Date, finished: boolean): boolean => {
+        if (finished) {
+            if (this.dates.finished === undefined) return false;
+            return (
+                this.dates.finished.getTime() >= firstDate.getTime() && 
+                this.dates.finished.getTime() <= endDate.getTime()
+            );
         }
+
+        if (this.dates.deleted === undefined) return false;
+        return (
+            this.dates.deleted.getTime() >= firstDate.getTime() && 
+            this.dates.deleted.getTime() <= endDate.getTime()
+        );
     }
 
     // Delete permanetly from the database.
@@ -156,5 +163,65 @@ export class Task {
         }
 
         await this._Delete()
+    }
+
+    // Static Methods
+    static FilterTasksByAccomplishTime(tasks: Task[], accomplishTime: string): Task[] {
+        let tasksFiltered: Task[] = [];
+
+    switch (accomplishTime) {
+        case '✅ YES':
+            for (const task of tasks) {
+                if (task.IsAccomplishTime()) {
+                    tasksFiltered.push(task);
+                }
+            }
+            return tasksFiltered;
+        case '🚫 NO':
+            for (const task of tasks) {
+                if (!task.IsAccomplishTime()) {
+                    tasksFiltered.push(task);
+                }
+            }
+            return tasksFiltered;
+        case 'Default':
+            return tasks;
+        default:
+            return tasks;
+    }
+    }
+    
+    static FilterTasksByDates(tasks: Task[], firstDate: Date, endDate: Date, finished: boolean): Task[] {
+        console.log("First Date: ", firstDate);
+        console.log("End Date: ", endDate);
+        let tasksFiltered: Task[] = [];
+        for (const task of tasks) {
+            if (task.FitInDates(firstDate, endDate, finished)) {
+                console.log("entra.");
+                tasksFiltered.push(task);
+            }
+        }
+    
+        return tasksFiltered;
+    }
+
+    static GetDatesFromData(data: DocumentData): TaskDates {
+        let mustEnd = undefined;
+        let finished = undefined;
+        let deleted = undefined;
+        const created = data.created.toDate();
+        if (data.mustEnd !== undefined) 
+            mustEnd = data.mustEnd.toDate(); 
+        if (data.finished !== undefined)
+            finished = data.finished.toDate();
+        if (data.deleted !== undefined)
+            deleted = data.deleted.toDate();
+
+        return {
+            created,
+            mustEnd,
+            finished,
+            deleted
+        }
     }
 }
