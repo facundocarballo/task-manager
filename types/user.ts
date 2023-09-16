@@ -132,6 +132,16 @@ export class User {
         }
     }
 
+    DeleteCategory(uidToDelete: string): undefined {
+        let newCategories = [];
+        for (const cat of this.categories) {
+            if (cat.uid !== uidToDelete) {
+                newCategories.push(cat);
+            }
+        }
+        this.categories = newCategories;
+    }
+
     GetCategoryFromName(name: string): Category|undefined {
         for (const cat of this.categories) {
             if (cat.name === name) {

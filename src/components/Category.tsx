@@ -1,4 +1,4 @@
-import { EditIcon, InfoIcon } from "@chakra-ui/icons";
+import { DeleteIcon, EditIcon, InfoIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -31,8 +31,6 @@ export interface ICategoryComponent {
 
 export const CategoryComponent = ({ cat }: ICategoryComponent) => {
   // Attributes
-  const taskDraggable = React.useRef<any>(null);
-  const taskReplaced = React.useRef<any>(null);
   const bgIconsButton = useColorModeValue("light.bg", "dark.bg");
   // Create Task
   const [createTaskIsOpen, setCreateTaskIsOpen] =
@@ -48,6 +46,8 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
   const [newColor, setNewColor] = React.useState<string>("");
   // Loading
   const [loading, setLoading] = React.useState<boolean>(false);
+  // Delete Category
+  const [openDelete, setOpenDelete] = React.useState<boolean>(false);
   // Alert Dialog
   const [openEdit, setOpenEdit] = React.useState<boolean>(false);
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -81,6 +81,20 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
     user.EditCategory(newTitle, newDescription, newColor, cat.uid);
     setUser(new User(user));
     setOpenEdit(false);
+  };
+
+  const handleDeleteCategory = async () => {
+    if (user === null) {
+      console.error("User is null.");
+      return
+    }
+
+    setLoading(true);
+    await cat.Delete();
+    setLoading(false);
+    user.DeleteCategory(cat.uid);
+    setUser(new User(user));
+    setOpenDelete(false);
   };
 
   const clearInputs = () => {
@@ -211,6 +225,53 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
         </AlertDialogOverlay>
       </AlertDialog>
 
+      {/* Alert Dialog - Delete Category */}
+      <AlertDialog
+        isOpen={openDelete}
+        leastDestructiveRef={cancelRef}
+        onClose={() => setOpenDelete(false)}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Deleting {cat.name}
+            </AlertDialogHeader>
+            <AlertDialogCloseButton />
+
+            <AlertDialogBody>
+              Are you sure that you want to delete this category?
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              {loading ? (
+                <HStack>
+                  <Text>Deleting Category</Text>
+                  <Box w="10px" />
+                  <Spinner />
+                </HStack>
+              ) : (
+                <>
+                  <Button
+                    variant="tomato"
+                    ref={cancelRef}
+                    onClick={() => setOpenDelete(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="primary"
+                    ref={cancelRef}
+                    onClick={handleDeleteCategory}
+                  >
+                    {"I'm sure."}
+                  </Button>
+                </>
+              )}
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
+
       <VStack
         minH="400px"
         maxH="400px"
@@ -238,7 +299,11 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
           <Button variant="secundary" onClick={() => setOpenEdit(true)}>
             Edit
           </Button>
+          <Button variant="secundary" onClick={() => setOpenDelete(true)}>
+            <DeleteIcon />
+          </Button>
         </HStack>
+
         {cat.tasks.map((task, idx) => {
           return (
             <VStack key={idx} w="full">

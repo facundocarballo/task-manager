@@ -1,6 +1,6 @@
 import { db } from "@/firebase/config";
 import { COLLECTION_Category, COLLECTION_Task, COLLECTION_TaskCompleted, COLLECTION_TaskDeleted, COLLECTION_USER } from "@/firebase/constants/collections";
-import { DocumentData, doc, setDoc, Timestamp, query, collection, getDocs } from "firebase/firestore";
+import { DocumentData, doc, setDoc, Timestamp, query, collection, getDocs, deleteDoc } from "firebase/firestore";
 import { Task, TaskDates } from "./task";
 
 export class Category {
@@ -34,15 +34,6 @@ export class Category {
         this.tasksDeleted = tasksDeleted;
         this.subCategories = subCategories;
         this.owner = owner;
-    }
-
-    private _DeleteTasksToDo(): boolean {
-
-        // Tasks to do
-        for (const t of this.tasks) {
-        }
-
-        return true;
     }
 
     // Constructor 2
@@ -87,6 +78,22 @@ export class Category {
             
         } catch (err) {
             console.error("Error editing the category. ", err);
+        }
+    }
+
+    async Delete(): Promise<undefined> {
+        try {
+            await deleteDoc(
+                doc(
+                    db,
+                    COLLECTION_USER + "/" + this.owner + "/" +
+                    COLLECTION_Category,
+                    this.uid
+                )
+            );
+            
+        }catch (err) {
+            console.error("Error deleting the Category. ", err);
         }
     }
 
