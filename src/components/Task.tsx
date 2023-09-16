@@ -34,9 +34,11 @@ export const TaskComponent = ({ task }: ITaskProps) => {
     const handleMouseEnter = () => {
         setMouseEnter(true);
     }
+    
     const handleMouseLeave = () => {
         setMouseEnter(false);
     }
+
     const handleCompleteTask = async () => {
         if (user === null) {
             console.error("User is null.");

@@ -24,7 +24,6 @@ export class Category {
         tasksDeleted: Task[],
         subCategories: Category[],
         owner: string
-
     ) {
         this.uid = uid;
         this.name = name;
@@ -104,6 +103,7 @@ export class Category {
                 name,
                 description,
                 this.uid,
+                this.name,
                 this.owner,
                 taskDates
             ));
@@ -132,6 +132,7 @@ export class Category {
                 data.name,
                 data.description,
                 this.uid,
+                this.name,
                 this.owner,
                 taskDates
             ));
@@ -158,6 +159,7 @@ export class Category {
                 data.name,
                 data.description,
                 this.uid,
+                this.name,
                 this.owner,
                 taskDates
             ));
@@ -184,6 +186,7 @@ export class Category {
                 data.name,
                 data.description,
                 this.uid,
+                this.name,
                 this.owner,
                 taskDates
             ));

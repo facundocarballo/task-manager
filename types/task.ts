@@ -15,6 +15,7 @@ export class Task {
     name: string;
     description: string;
     category: string;
+    categoryName: string;
     owner: string;
     dates: TaskDates;
 
@@ -23,6 +24,7 @@ export class Task {
         name: string,
         description: string,
         category: string,
+        categoryName: string,
         owner: string,
         dates: TaskDates
     ) {
@@ -32,6 +34,7 @@ export class Task {
         this.name = name;
         this.description = description;
         this.dates = dates;
+        this.categoryName = categoryName;
     }
 
     static GetDatesFromData(data: DocumentData): TaskDates {
@@ -91,6 +94,7 @@ export class Task {
                       created: Timestamp.fromDate(this.dates.created),
                       mustEnd: Timestamp.fromDate(this.dates.mustEnd),
                       category: this.uid,
+                      categoryName: this.categoryName,
                       owner: this.owner
                     }
                 );
@@ -103,6 +107,7 @@ export class Task {
                       finished: Timestamp.now(),
                       created: Timestamp.fromDate(this.dates.created),
                       category: this.uid,
+                      categoryName: this.categoryName,
                       owner: this.owner
                     }
                 );
@@ -132,6 +137,7 @@ export class Task {
                     created: Timestamp.fromDate(this.dates.created),
                     mustEnd: Timestamp.fromDate(this.dates.mustEnd),
                     category: this.uid,
+                    categoryName: this.categoryName,
                     owner: this.owner
                 })
             } else {
@@ -141,6 +147,7 @@ export class Task {
                     deleted: Timestamp.now(),
                     created: Timestamp.fromDate(this.dates.created),
                     category: this.uid,
+                    categoryName: this.categoryName,
                     owner: this.owner
                 })
             }

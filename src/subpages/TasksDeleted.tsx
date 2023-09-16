@@ -5,11 +5,9 @@ import {
   Spacer,
   VStack,
   Box,
-  Text,
   Button,
   useDisclosure,
-} from "@chakra-ui/react";
-import {
+  // Table
   Table,
   Thead,
   Tbody,
@@ -17,8 +15,7 @@ import {
   Th,
   Td,
   TableContainer,
-} from "@chakra-ui/react";
-import {
+  // Alert Dialog
   AlertDialog,
   AlertDialogBody,
   AlertDialogFooter,
@@ -26,8 +23,7 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   AlertDialogCloseButton,
-} from "@chakra-ui/react";
-import {
+  // Alert Dialog
   Accordion,
   AccordionItem,
   AccordionButton,
@@ -64,14 +60,12 @@ export const TasksDeleted = () => {
     }
     return categoriesName;
   };
-  const getCategoryName = (id: number): string => {
-    if (categories == null) return "Don't found category with that id";
-    return categories[id].title;
-  };
+
   const handleSetDate: Handler = (e: string, func: SetFunc) => {
     const date = new Date(e);
     func(date);
   };
+  
   const filterData = () => {
     if (categories == null) return;
 
@@ -165,12 +159,12 @@ export const TasksDeleted = () => {
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {tasksDeleted.map((task) => (
-                          <Tr>
-                            <Td>{task.title}</Td>
-                            <Td>{getStringDate(task.dateCreated)}</Td>
-                            <Td>{getStringDate(task.dateEnded)}</Td>
-                            <Td>{getCategoryName(task.category_id)}</Td>
+                        {user.tasksDeleted.map((task, idx) => (
+                          <Tr key={idx}>
+                            <Td>{task.name}</Td>
+                            <Td>{getStringDate(task.dates.created)}</Td>
+                            <Td>{getStringDate(task.dates.deleted)}</Td>
+                            <Td>{task.categoryName}</Td>
                           </Tr>
                         ))}
                       </Tbody>

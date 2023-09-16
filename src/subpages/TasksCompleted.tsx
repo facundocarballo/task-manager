@@ -7,9 +7,8 @@ import {
   Text,
   Button,
   useDisclosure,
-  Spinner
-} from "@chakra-ui/react";
-import {
+  Spinner,
+  // Table
   Table,
   Thead,
   Tbody,
@@ -17,8 +16,7 @@ import {
   Th,
   Td,
   TableContainer,
-} from "@chakra-ui/react";
-import {
+  // AlertDialog
   AlertDialog,
   AlertDialogBody,
   AlertDialogFooter,
@@ -26,8 +24,7 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   AlertDialogCloseButton,
-} from "@chakra-ui/react";
-import {
+  // Accordion
   Accordion,
   AccordionItem,
   AccordionButton,
@@ -57,7 +54,7 @@ export const TasksCompleted = () => {
   const cancelRef = React.useRef(null);
 
   // Context
-  const { user, categories, tasksCompleted, setTasksCompleted } = useProvider();
+  const { user, categories, setTasksCompleted } = useProvider();
 
   // Methods
   const showCorrectIcon = (
@@ -69,11 +66,7 @@ export const TasksCompleted = () => {
     if (timeReal > timeExpected) return <Text>🚫</Text>;
     return <Text>✅</Text>;
   };
-  const getCategoryName = (id: string): string => {
-    // if (categories == null) return "Don't found category with that id";
-    // return categories[id].title;
-    return "Cat. Name"
-  };
+
   const getCategories = (): string[] => {
     if (categories == null) return [];
     const categoriesName: string[] = ["Default"];
@@ -196,8 +189,8 @@ export const TasksCompleted = () => {
                         </Tr>
                       </Thead>
                       <Tbody>
-                        {user.tasksCompleted.map((task) => (
-                          <Tr>
+                        {user.tasksCompleted.map((task, idx) => (
+                          <Tr key={idx}>
                             <Td>{task.name}</Td>
                             <Td>{getStringDate(task.dates.created)}</Td>
                             <Td>{getStringDate(task.dates.finished)}</Td>
@@ -207,7 +200,7 @@ export const TasksCompleted = () => {
                                 task.dates.finished?.getTime()
                               )}
                             </Td>
-                            <Td>{getCategoryName(task.category)}</Td>
+                            <Td>{task.categoryName}</Td>
                           </Tr>
                         ))}
                       </Tbody>
