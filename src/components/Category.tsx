@@ -275,8 +275,8 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
       <VStack
         minH="400px"
         maxH="400px"
-        minW="600px"
-        maxW="600px"
+        minW={{lg: "600px", md: "600px", sm: "full"}}
+        maxW={{lg: "600px", md: "600px", sm: "full"}}
         borderRadius="10px"
         overflowY="scroll"
       >

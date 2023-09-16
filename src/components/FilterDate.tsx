@@ -37,7 +37,7 @@ export const FilterDate = ({ values, title, handler, setFuncs }: IFilterDate) =>
                             value={values[0]}
                             onChange={(e) => handler(e.currentTarget.value, setFuncs[0])}
                             type="datetime-local"
-                            w='190px'
+                            w={{md: '190px', base: '170px'}}
                         />
                     </VStack>
                     <Spacer />
@@ -51,7 +51,7 @@ export const FilterDate = ({ values, title, handler, setFuncs }: IFilterDate) =>
                             value={values[1]}
                             onChange={(e) => handler(e.currentTarget.value, setFuncs[1])}
                             type="datetime-local"
-                            w='190px'
+                            w={{md: '190px', base: '170px'}}
                         />
                     </VStack>
                     <Box w='30px' />

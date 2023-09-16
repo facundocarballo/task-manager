@@ -108,13 +108,22 @@ export const Categories = () => {
               </Button>
               <Box w="20px" />
             </HStack>
-            <Grid templateColumns="repeat(3, 1fr)" gap={6}>
+            <Grid display={{lg: 'flex', md: 'flex', sm: 'none', base: 'none'}} templateColumns="repeat(3, 1fr)" gap={6}>
               {user.categories.map((cat, idx) => (
                 <GridItem key={idx}>
                   <MiniCategory cat={cat} />
                 </GridItem>
               ))}
             </Grid>
+
+            <VStack display={{lg: 'none', md: 'none', sm: 'flex', base: 'flex'}}>
+              {user.categories.map((cat, idx) => (
+                <GridItem key={idx}>
+                  <MiniCategory cat={cat} />
+                </GridItem>
+              ))}
+            </VStack>
+
           </VStack>
         </>
       )}

@@ -36,7 +36,7 @@ export const MiniCategory = ({ cat }: IMiniCategory) => {
         isOpen={isOpen}
         leastDestructiveRef={cancelRef}
         onClose={onClose}
-        size="2xl"
+        size={{lg: "2xl", md: "2xl", sm: "md", base: "md"}}
       >
         <AlertDialogOverlay>
           <AlertDialogContent>
