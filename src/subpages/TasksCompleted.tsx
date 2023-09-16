@@ -54,7 +54,7 @@ export const TasksCompleted = () => {
   const cancelRef = React.useRef(null);
 
   // Context
-  const { user, categories, setTasksCompleted } = useProvider();
+  const { user } = useProvider();
 
   // Methods
   const showCorrectIcon = (
@@ -68,10 +68,10 @@ export const TasksCompleted = () => {
   };
 
   const getCategories = (): string[] => {
-    if (categories == null) return [];
+    if (user == null) return [];
     const categoriesName: string[] = ["Default"];
-    for (const cat of categories) {
-      categoriesName.push(cat.title);
+    for (const cat of user.categories) {
+      categoriesName.push(cat.name);
     }
     return categoriesName;
   };
@@ -82,30 +82,30 @@ export const TasksCompleted = () => {
   };
 
   const filterData = () => {
-    if (categories == null) return;
+    if (user == null) return;
 
-    const categoryId = getCategoryIdFromName(categoryName, categories);
+    // const categoryId = getCategoryIdFromName(categoryName, categories);
 
-    const allTasksCompleted = getAllTaskCompleted(categories);
+    // const allTasksCompleted = getAllTaskCompleted(categories);
 
-    const tasksFilterByAccomplishTime = getTaskFilterByAccomplishTime(
-      allTasksCompleted,
-      accomplishTime
-    );
+    // const tasksFilterByAccomplishTime = getTaskFilterByAccomplishTime(
+    //   allTasksCompleted,
+    //   accomplishTime
+    // );
 
-    const tasksFilterByCategory = getTaskFilterByCategory(
-      tasksFilterByAccomplishTime,
-      categoryId
-    );
+    // const tasksFilterByCategory = getTaskFilterByCategory(
+    //   tasksFilterByAccomplishTime,
+    //   categoryId
+    // );
 
-    const tasksFilterByDate = getTaskFilterByDate(
-      tasksFilterByCategory,
-      firstDate,
-      endDate
-    );
+    // const tasksFilterByDate = getTaskFilterByDate(
+    //   tasksFilterByCategory,
+    //   firstDate,
+    //   endDate
+    // );
 
-    onClose();
-    setTasksCompleted(tasksFilterByDate);
+    // onClose();
+    // setTasksCompleted(tasksFilterByDate);
     return;
   };
 

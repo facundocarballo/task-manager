@@ -30,12 +30,10 @@ export default function Home() {
   const cancelRef = React.useRef(null);
   const onClose = () => setIsOpen(false);
   // Context
-  const { user, setUser, categories, setTasksCompleted } = useProvider();
+  const { user, setUser } = useProvider();
   // React Use Effect
   React.useEffect(() => {
     handleUserEffect();
-    if (categories == null) return;
-    setTasksCompleted(getAllTaskCompleted(categories));
   }, []);
 
   const handleUserEffect = async () => {

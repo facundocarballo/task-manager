@@ -50,13 +50,13 @@ export const TasksDeleted = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef(null);
   // Context
-  const { user, categories, tasksDeleted, setTasksDeleted } = useProvider();
+  const { user } = useProvider();
   // Methods
   const getCategories = (): string[] => {
-    if (categories == null) return [];
+    if (user == null) return [];
     const categoriesName: string[] = ["Default"];
-    for (const cat of categories) {
-      categoriesName.push(cat.title);
+    for (const cat of user.categories) {
+      categoriesName.push(cat.name);
     }
     return categoriesName;
   };
@@ -67,26 +67,26 @@ export const TasksDeleted = () => {
   };
   
   const filterData = () => {
-    if (categories == null) return;
+    // if (categories == null) return;
 
-    const categoryId = getCategoryIdFromName(categoryName, categories);
+    // const categoryId = getCategoryIdFromName(categoryName, categories);
 
-    const allTasksDeleted = getAllTaskDeleted(categories);
+    // const allTasksDeleted = getAllTaskDeleted(categories);
 
-    const tasksFilterByCategory = getTaskFilterByCategory(
-      allTasksDeleted,
-      categoryId
-    );
+    // const tasksFilterByCategory = getTaskFilterByCategory(
+    //   allTasksDeleted,
+    //   categoryId
+    // );
 
-    const tasksFilterByDate = getTaskFilterByDate(
-      tasksFilterByCategory,
-      firstDate,
-      endDate
-    );
+    // const tasksFilterByDate = getTaskFilterByDate(
+    //   tasksFilterByCategory,
+    //   firstDate,
+    //   endDate
+    // );
 
-    onClose();
-    setTasksDeleted(tasksFilterByDate);
-    return;
+    // onClose();
+    // setTasksDeleted(tasksFilterByDate);
+    // return;
   };
   // Component
   return (
@@ -134,7 +134,7 @@ export const TasksDeleted = () => {
                 <Box as="span" flex="1" textAlign="left">
                   <Heading>
                     {user.tasksDeleted.length} Task
-                    {tasksDeleted.length > 1 ? "s" : null} Deleted
+                    {user.tasksDeleted.length > 1 ? "s" : null} Deleted
                   </Heading>
                 </Box>
                 <AccordionIcon />
