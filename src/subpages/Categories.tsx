@@ -16,6 +16,8 @@ import {
   AlertDialogOverlay,
   AlertDialogCloseButton,
   Spinner,
+  useColorMode,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import React from "react";
 import { useProvider } from "../context";
@@ -25,9 +27,10 @@ import { User } from "@/types/user";
 
 export const Categories = () => {
   // Attributes
+  const bg = useColorModeValue("light.bg", "dark.bg");
   const [newTitle, setNewTitle] = React.useState<string>("");
   const [newDescription, setNewDescription] = React.useState<string>("");
-  const [newColor, setNewColor] = React.useState<string>("dark.bg");
+  const [newColor, setNewColor] = React.useState<string>(bg);
   const [loading, setLoading] = React.useState<boolean>(false);
 
   // Alert Dialog
