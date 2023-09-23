@@ -1,4 +1,4 @@
-import { DeleteIcon, EditIcon, InfoIcon } from "@chakra-ui/icons";
+import { AddIcon, DeleteIcon, EditIcon, InfoIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
@@ -16,6 +16,7 @@ import {
   AlertDialogOverlay,
   AlertDialogCloseButton,
   Spinner,
+  Divider,
 } from "@chakra-ui/react";
 import React from "react";
 import { TaskComponent } from "./Task";
@@ -24,12 +25,14 @@ import { CreateCategory } from "./CreateCategory";
 import { Category } from "@/types/category";
 import { useProvider } from "../context";
 import { User } from "@/types/user";
+import { MiniCategory } from "./MiniCategory";
 
 export interface ICategoryComponent {
   cat: Category;
+  onCloseCategory: () => void
 }
 
-export const CategoryComponent = ({ cat }: ICategoryComponent) => {
+export const CategoryComponent = ({ cat, onCloseCategory }: ICategoryComponent) => {
   // Attributes
   const bgIconsButton = useColorModeValue("light.bg", "dark.bg");
   // Create Task
@@ -46,6 +49,9 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
   const [newColor, setNewColor] = React.useState<string>("");
   // Loading
   const [loading, setLoading] = React.useState<boolean>(false);
+  // Create Category
+  const [openCreateCategory, setOpenCreateCategory] =
+    React.useState<boolean>(false);
   // Delete Category
   const [openDelete, setOpenDelete] = React.useState<boolean>(false);
   // Alert Dialog
@@ -83,18 +89,27 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
     setOpenEdit(false);
   };
 
+  const handleCreateSubCategory = async () => {
+    setLoading(true);
+    await cat.CreateSubCategory(newTitle, newDescription, newColor);
+    clearInputs();
+    setLoading(false);
+    setOpenCreateCategory(false);
+  };
+
   const handleDeleteCategory = async () => {
     if (user === null) {
       console.error("User is null.");
-      return
+      return;
     }
 
     setLoading(true);
     await cat.Delete();
     setLoading(false);
-    user.DeleteCategory(cat.uid);
+    user.DeleteCategory(cat.uid, cat.parentsUids);
     setUser(new User(user));
     setOpenDelete(false);
+    onCloseCategory();
   };
 
   const clearInputs = () => {
@@ -225,6 +240,47 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
         </AlertDialogOverlay>
       </AlertDialog>
 
+      {/* Alert Dialog - Category Edit */}
+      <AlertDialog
+        isOpen={openCreateCategory}
+        leastDestructiveRef={cancelRef}
+        onClose={() => setOpenCreateCategory(false)}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Create Subctegory for {cat.name}
+            </AlertDialogHeader>
+            <AlertDialogCloseButton />
+
+            <AlertDialogBody>
+              <CreateCategory
+                title={newTitle}
+                description={newDescription}
+                color={newColor}
+                setTitle={setNewTitle}
+                setDescription={setNewDescription}
+                setColor={setNewColor}
+              />
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              {loading ? (
+                <Spinner />
+              ) : (
+                <Button
+                  variant="primary"
+                  ref={cancelRef}
+                  onClick={handleCreateSubCategory}
+                >
+                  Create
+                </Button>
+              )}
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
+
       {/* Alert Dialog - Delete Category */}
       <AlertDialog
         isOpen={openDelete}
@@ -273,10 +329,10 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
       </AlertDialog>
 
       <VStack
-        minH="400px"
-        maxH="400px"
-        minW={{lg: "600px", md: "600px", sm: "full"}}
-        maxW={{lg: "600px", md: "600px", sm: "full"}}
+        minH="600px"
+        maxH="600px"
+        minW={{ lg: "600px", md: "600px", sm: "full" }}
+        maxW={{ lg: "600px", md: "600px", sm: "full" }}
         borderRadius="10px"
         overflowY="scroll"
       >
@@ -303,14 +359,34 @@ export const CategoryComponent = ({ cat }: ICategoryComponent) => {
             <DeleteIcon />
           </Button>
         </HStack>
+        <Box h="5px" />
+        <Divider />
+        <Box h="5px" />
+        <HStack w="full">
+          <Box w="10px" />
+          <Text fontSize="25px" fontWeight="bold">
+            Subcategories
+          </Text>
+          <Spacer />
+          <Button
+            variant="info"
+            bg={bgIconsButton}
+            onClick={() => setOpenCreateCategory(true)}
+          >
+            <AddIcon />
+          </Button>
+          <Box w="10px" />
+        </HStack>
+        <HStack w="full">
+          {cat.subCategories.map((subcat, idx) => (
+            <MiniCategory cat={subcat} key={idx} />
+          ))}
+        </HStack>
+        <Box h="5px" />
 
-        {cat.tasks.map((task, idx) => {
-          return (
-            <VStack key={idx} w="full">
-              <TaskComponent task={task} />
-            </VStack>
-          );
-        })}
+        {cat.tasks.map((task, idx) => (
+          <TaskComponent task={task} key={idx} />
+        ))}
         <Spacer />
       </VStack>
     </>

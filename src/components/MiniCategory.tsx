@@ -52,6 +52,7 @@ export const MiniCategory = ({ cat }: IMiniCategory) => {
             <AlertDialogBody>
               <CategoryComponent
                 cat={cat}
+                onCloseCategory={onClose}
               />
             </AlertDialogBody>
 
