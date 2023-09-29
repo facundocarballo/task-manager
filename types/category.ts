@@ -65,9 +65,9 @@ export class Category {
             parentsUids
         );
         console.log(`Creando ${data.name} con ParentUIDs[${parentsUids}]`)
-        await newCategory.GetTasksToDo();
-        await newCategory.GetTasksCompleted();
-        await newCategory.GetTasksDeleted();
+        await newCategory.GetTasksToDoFirebase();
+        await newCategory.GetTasksCompletedFirebase();
+        await newCategory.GetTasksDeletedFirebase();
         await newCategory.GetSubCategories();
         return newCategory;
     }
@@ -158,7 +158,7 @@ export class Category {
         }
     }
 
-    async GetTasksToDo(): Promise<undefined> {
+    async GetTasksToDoFirebase(): Promise<undefined> {
         const q = query(
             collection(
                 db,
@@ -185,7 +185,7 @@ export class Category {
         }
     }
 
-    async GetTasksCompleted(): Promise<undefined> {
+    async GetTasksCompletedFirebase(): Promise<undefined> {
         const q = query(
             collection(
                 db,
@@ -212,7 +212,7 @@ export class Category {
         }
     }
 
-    async GetTasksDeleted(): Promise<undefined> {
+    async GetTasksDeletedFirebase(): Promise<undefined> {
         const q = query(
             collection(
                 db,
@@ -237,6 +237,48 @@ export class Category {
                 taskDates
             ));
         }
+    }
+
+    GetTasksToDo(): Task[] {
+        let tasks: Task[] = [];
+
+        for (const t of this.tasks) {
+            tasks.push(t);
+        }
+
+        for (const subCat of this.subCategories) {
+            tasks.push(...subCat.GetTasksToDo());
+        }
+
+        return tasks;
+    }
+
+    GetTasksCompleted(): Task[] {
+        let tasks: Task[] = [];
+
+        for (const t of this.tasksCompleted) {
+            tasks.push(t);
+        }
+
+        for (const subCat of this.subCategories) {
+            tasks.push(...subCat.GetTasksCompleted());
+        }
+
+        return tasks;
+    }
+
+    GetTasksDeleted(): Task[] {
+        let tasks: Task[] = [];
+
+        for (const t of this.tasksDeleted) {
+            tasks.push(t);
+        }
+
+        for (const subCat of this.subCategories) {
+            tasks.push(...subCat.GetTasksDeleted());
+        }
+        
+        return tasks;
     }
 
     // Subcategories
@@ -315,6 +357,4 @@ export class Category {
             console.error(`Error getting subcategories of ${this.name}. ERROR: ${err}`)
         }
     }
-
-
 }

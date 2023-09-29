@@ -192,18 +192,7 @@ export class User {
     }
 
     DeleteCategory(uidToDelete: string, paths: string[]): undefined {
-        // let newCategories = [];
-        // for (const cat of this.categories) {
-        //     if (cat.uid !== uidToDelete) {
-        //             newCategories.push(cat);
-        //     }
-        // }
-        // this.categories = newCategories;
-    
-        // console.log("Path: ", path)
-
         this._DeleteCategory(uidToDelete, this.categories, paths)
-
     }
 
     GetCategoryFromName(name: string): Category|undefined {
@@ -217,17 +206,13 @@ export class User {
     // Tasks
     GetAllTasksCompleted(): undefined {
         for (const cat of this.categories) {
-            for (const task of cat.tasksCompleted) {
-                this.tasksCompleted.push(task);
-            }
+            this.tasksCompleted.push(...cat.GetTasksCompleted());
         }
     }
 
     GetAllTasksDeleted(): undefined {
         for (const cat of this.categories) {
-            for (const task of cat.tasksDeleted) {
-                this.tasksDeleted.push(task);
-            }
+            this.tasksDeleted.push(...cat.GetTasksDeleted());
         }
     }
 
@@ -264,7 +249,6 @@ export class User {
             }
         }
     }
-
 
     async SaveToken(accessToken: string): Promise<undefined> {
         try {

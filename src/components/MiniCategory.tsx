@@ -88,7 +88,7 @@ export const MiniCategory = ({ cat }: IMiniCategory) => {
           {cat.name}
         </Text>
         <Divider />
-        <Text>{cat.tasks.length}</Text>
+        <Text>{cat.GetTasksToDo().length}</Text>
         <Box h="5px" />
       </VStack>
     </>
