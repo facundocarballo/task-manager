@@ -377,7 +377,7 @@ export const CategoryComponent = ({ cat, onCloseCategory }: ICategoryComponent) 
           </Button>
           <Box w="10px" />
         </HStack>
-        <HStack w="full">
+        <HStack w="full" overflowX='scroll'>
           {cat.subCategories.map((subcat, idx) => (
             <MiniCategory cat={subcat} key={idx} />
           ))}

@@ -11,6 +11,8 @@ import {
   AlertDialogOverlay,
   AlertDialogCloseButton,
   useDisclosure,
+  HStack,
+  Spacer,
 } from "@chakra-ui/react";
 import React from "react";
 import { CategoryComponent } from "./Category";
@@ -27,6 +29,17 @@ export const MiniCategory = ({ cat }: IMiniCategory) => {
   const cancelRef = React.useRef(null);
   // Context
   // Methods
+  const getFontSizeFromTitle = (title: string) => {
+    let size = "18";
+
+    if (title.length > 13) size = "16";
+
+    if (title.length > 20) size = "15";
+
+    if (title.length > 30) size = "12";
+
+    return size + "px";
+  };
   // Drag and Drop Categories
   // Component
   return (
@@ -36,7 +49,7 @@ export const MiniCategory = ({ cat }: IMiniCategory) => {
         isOpen={isOpen}
         leastDestructiveRef={cancelRef}
         onClose={onClose}
-        size={{lg: "2xl", md: "2xl", sm: "md", base: "md"}}
+        size={{ lg: "2xl", md: "2xl", sm: "md", base: "md" }}
       >
         <AlertDialogOverlay>
           <AlertDialogContent>
@@ -50,10 +63,7 @@ export const MiniCategory = ({ cat }: IMiniCategory) => {
             <AlertDialogCloseButton />
 
             <AlertDialogBody>
-              <CategoryComponent
-                cat={cat}
-                onCloseCategory={onClose}
-              />
+              <CategoryComponent cat={cat} onCloseCategory={onClose} />
             </AlertDialogBody>
 
             <AlertDialogFooter></AlertDialogFooter>
@@ -62,7 +72,8 @@ export const MiniCategory = ({ cat }: IMiniCategory) => {
       </AlertDialog>
 
       <VStack
-        w="250px"
+        minW="250px"
+        minH='90px'
         bg={`${cat.color}`}
         borderRadius="10px"
         _hover={{
@@ -73,7 +84,7 @@ export const MiniCategory = ({ cat }: IMiniCategory) => {
         onClick={onOpen}
       >
         <Box h="1px" />
-        <Text fontWeight="bold" fontSize="18px">
+        <Text align='center' fontWeight="bold" fontSize={getFontSizeFromTitle(cat.name)}>
           {cat.name}
         </Text>
         <Divider />
