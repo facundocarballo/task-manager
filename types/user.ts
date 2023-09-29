@@ -21,7 +21,7 @@ export class User {
         this.uid = user.uid;
         this.displayName = user.displayName;
         this.email = user.email;
-        this.photoUrl = user.photoUrl;
+        this.photoUrl = user.photoURL;
 
         if (user.categories === undefined)
             this.categories = [];
@@ -142,13 +142,29 @@ export class User {
     }
 
     // Tasks
+    async GetTasksDeletedFirebase(): Promise<undefined> {
+        for (const cat of this.categories) {
+            await cat.GetTasksDeletedFromFirebase();
+        }
+        this.GetAllTasksDeleted();
+    }
+
+    async GetTasksCompletedFirebase(): Promise<undefined> {
+        for (const cat of this.categories) {
+            await cat.GetTasksCompletedFromFirebase();
+        }
+        this.GetAllTasksCompleted();
+    }
+
     GetAllTasksCompleted(): undefined {
+        this.tasksCompleted = [];
         for (const cat of this.categories) {
             this.tasksCompleted.push(...cat.GetTasksCompleted());
         }
     }
 
     GetAllTasksDeleted(): undefined {
+        this.tasksDeleted = [];
         for (const cat of this.categories) {
             this.tasksDeleted.push(...cat.GetTasksDeleted());
         }
@@ -202,12 +218,12 @@ export class User {
         return localStorage.getItem(USER_TOKEN_KEY);
     }
 
-    static async CreateUserWithCredential(user: any): Promise<User> {
+    static async CreateUserWithCredential(
+        user: any
+    ): Promise<User> {
         const newUser = new User(user);
         await newUser.Save();
         await newUser.GetCategories();
-        newUser.GetAllTasksCompleted();
-        newUser.GetAllTasksDeleted();
         return newUser;
     }
 }

@@ -12,7 +12,7 @@ dotenv.config();
 export const CreateUserForm = () => {
   // Attributes
   // Context
-  const { setUser, setTasksCompleted, setTasksDeleted } = useProvider();
+  const { setUser } = useProvider();
   // Methods
   const handleSiginGoogle = async () => {
     const auth = getAuth();
@@ -30,8 +30,6 @@ export const CreateUserForm = () => {
         return
       }
       user.SaveToken(token);
-      setTasksCompleted(user.tasksCompleted);
-      setTasksDeleted(user.tasksDeleted);
       setUser(user);
     } catch (err) {
       console.error("Error sigin with google. ", err);

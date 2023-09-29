@@ -1,11 +1,14 @@
-import Head from "next/head";
-import React from "react";
+import { CreateUserForm } from "@/src/components/CreateUserForm";
 import { NavBar } from "@/src/components/NavBar";
 import { TheDivider } from "@/src/components/TheDivider";
-import { Categories } from "@/src/subpages/Categories";
+import { useProvider } from "@/src/context";
+import { trySiginWithCredential } from "@/src/handlers/google";
 import { Footer } from "@/src/subpages/Footer";
+import { TasksCompleted } from "@/src/subpages/TasksCompleted";
 import {
+  Box,
   Spacer,
+  Spinner,
   VStack,
   AlertDialog,
   AlertDialogBody,
@@ -13,43 +16,54 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
   AlertDialogCloseButton,
-  Spinner,
-  Box,
 } from "@chakra-ui/react";
-import { TasksCompleted } from "@/src/subpages/TasksCompleted";
-import { useProvider } from "@/src/context";
-import { CreateUserForm } from "@/src/components/CreateUserForm";
-import { TasksDeleted } from "@/src/subpages/TasksDeleted";
-import { trySiginWithCredential } from "@/src/handlers/google";
+import Head from "next/head";
+import React from "react";
+
 
 let read: boolean = true;
+let readTasksCompleted: boolean = true
 
-export default function Home() {
+export default function TasksCompletedPage() {
+  // Attributes
   const [isOpen, setIsOpen] = React.useState<boolean>(false);
   const [heightSize, setHeightSize] = React.useState<number>(0);
+  const [loadingTasks, setLoadingTasks] = React.useState<boolean>(false);
   const cancelRef = React.useRef(null);
-  const onClose = () => setIsOpen(false);
   // Context
-  const { user, setUser } = useProvider();
-  // React Use Effect
-  React.useEffect(() => {
-    handleUserEffect();
-    setHeightSize(window.innerHeight);
-  }, []);
-
+  const { user, setUser, tasksDeleted, setTasksCompleted } = useProvider();
+  // Methods
+  const onClose = () => setIsOpen(false);
+  
   const handleUserEffect = async () => {
     if (!read) return;
     read = false;
 
-    const user = await trySiginWithCredential();
-    if (user == undefined) {
+    const theUser = await trySiginWithCredential();
+    if (theUser == undefined) {
       setIsOpen(true);
       return;
     }
-
-    setUser(user);
+    setUser(theUser);
   };
 
+  const handleGetTasksCompleted = async () => {
+    if (user !== null && readTasksCompleted) {
+        readTasksCompleted = false;
+        setLoadingTasks(true);
+        await user.GetTasksCompletedFirebase();
+        setTasksCompleted(user.tasksCompleted);
+        setLoadingTasks(false);
+    }
+  }
+
+  // React Use Effect
+  React.useEffect(() => {
+    handleUserEffect();
+    setHeightSize(window.innerHeight);
+    handleGetTasksCompleted();
+  },);
+  // Component
   return (
     <>
       <AlertDialog
@@ -73,27 +87,25 @@ export default function Home() {
 
       <VStack minH={heightSize}>
         <Head>
-          <title>Task Manager</title>
-          <meta name="description" content="App to handle all of your tasks." />
+          <title>Tasks Completed</title>
+          <meta
+            name="description"
+            content="Visualize all of your tasks completed."
+          />
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="icon" href="/favicon.ico" />
         </Head>
         <NavBar />
-        {user == null ? (
+        {loadingTasks ? (
           <>
-            <Box h='200px' />
+            <Box h="200px" />
             <Spinner />
-            <Box h='200px' />
+            <Box h="200px" />
           </>
         ) : (
           <>
+            <TasksCompleted />
             <TheDivider horizontal={true} />
-            <Categories />
-            <TheDivider horizontal={true} />
-            {/* <TasksCompleted />
-            <TheDivider horizontal={true} />
-            <TasksDeleted />
-            <TheDivider horizontal={true} /> */}
           </>
         )}
         <Spacer />

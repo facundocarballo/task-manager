@@ -64,9 +64,9 @@ export class Category {
             path,
             parentsUids
         );
-        await newCategory.GetTasksToDoFirebase();
-        await newCategory.GetTasksCompletedFirebase();
-        await newCategory.GetTasksDeletedFirebase();
+        await newCategory._GetTasksToDoFirebase();
+        // await newCategory.GetTasksCompletedFirebase();
+        // await newCategory.GetTasksDeletedFirebase();
         await newCategory.GetSubCategories();
         return newCategory;
     }
@@ -176,7 +176,23 @@ export class Category {
         }
     }
 
-    async GetTasksToDoFirebase(): Promise<undefined> {
+    async GetTasksDeletedFromFirebase(): Promise<undefined> {
+        await this._GetTasksDeletedFirebase();
+
+        for (const subCat of this.subCategories) {
+            subCat.GetTasksDeletedFromFirebase();
+        }
+    }
+
+    async GetTasksCompletedFromFirebase(): Promise<undefined> {
+        await this._GetTasksCompletedFirebase();
+
+        for (const subCat of this.subCategories) {
+            subCat.GetTasksCompletedFromFirebase();
+        }
+    }
+
+    private async _GetTasksToDoFirebase(): Promise<undefined> {
         const q = query(
             collection(
                 db,
@@ -203,7 +219,7 @@ export class Category {
         }
     }
 
-    async GetTasksCompletedFirebase(): Promise<undefined> {
+    private async _GetTasksCompletedFirebase(): Promise<undefined> {
         const q = query(
             collection(
                 db,
@@ -230,7 +246,7 @@ export class Category {
         }
     }
 
-    async GetTasksDeletedFirebase(): Promise<undefined> {
+    private async _GetTasksDeletedFirebase(): Promise<undefined> {
         const q = query(
             collection(
                 db,
