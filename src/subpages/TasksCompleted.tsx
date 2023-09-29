@@ -65,7 +65,7 @@ export const TasksCompleted = () => {
     if (user == null) return [];
     const categoriesName: string[] = ["Default"];
     for (const cat of user.categories) {
-      categoriesName.push(cat.name);
+      categoriesName.push(...cat.GetCategoriesName());
     }
     return categoriesName;
   };
@@ -77,6 +77,7 @@ export const TasksCompleted = () => {
 
   const filterData = () => {
     if (user == null) return;
+    // Arreglar el filtro por subcategorias.
     const cat = user.GetCategoryFromName(categoryName);
     let fileteredTasks: Task[] = [];
 

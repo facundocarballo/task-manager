@@ -107,6 +107,25 @@ export class Category {
         }
     }
 
+    GetCategoriesName(): string[] {
+        let res: string[] = [];
+        res.push(this.name);
+
+        for (const subCat of this.subCategories) {
+            res.push(...subCat.GetCategoriesName())
+        }
+
+        return res;
+    }
+
+    FindCategoryByName(name: string): Category|undefined {
+        if (this.name === name) return this;
+        for (const subCat of this.subCategories) {
+            const c = subCat.FindCategoryByName(name);
+            if (c != undefined) return c;
+        }
+    }
+
     // Tasks
     async CreateTask(name: string, description: string, mustEnd?: Date): Promise<undefined> {
         try {

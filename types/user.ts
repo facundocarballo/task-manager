@@ -135,9 +135,9 @@ export class User {
 
     GetCategoryFromName(name: string): Category|undefined {
         for (const cat of this.categories) {
-            if (cat.name === name) {
-                return cat;
-            }
+           const theCat = cat.FindCategoryByName(name);
+           if (theCat !== undefined) 
+            return theCat;
         }
     }
 
