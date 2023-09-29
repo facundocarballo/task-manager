@@ -37,6 +37,7 @@ import { getStringDate } from "../handlers/date";
 import { FilterItem } from "../components/FilterItem";
 import { FilterDate, Handler, SetFunc } from "../components/FilterDate";
 import { Task } from "@/types/task";
+import { GetCategories } from "../handlers/filter";
 
 export const TasksCompleted = () => {
   // Attributes
@@ -61,15 +62,6 @@ export const TasksCompleted = () => {
     return <Text>✅</Text>;
   };
 
-  const getCategories = (): string[] => {
-    if (user == null) return [];
-    const categoriesName: string[] = ["Default"];
-    for (const cat of user.categories) {
-      categoriesName.push(...cat.GetCategoriesName());
-    }
-    return categoriesName;
-  };
-
   const handleSetDate: Handler = (e: string, func: SetFunc) => {
     const date = new Date(e);
     func(date);
@@ -77,7 +69,6 @@ export const TasksCompleted = () => {
 
   const filterData = () => {
     if (user == null) return;
-    // Arreglar el filtro por subcategorias.
     const cat = user.GetCategoryFromName(categoryName);
     let fileteredTasks: Task[] = [];
 
@@ -138,7 +129,7 @@ export const TasksCompleted = () => {
                   />
                   <FilterItem
                     title="Category"
-                    options={getCategories()}
+                    options={GetCategories(user)}
                     selected={categoryName}
                     setSelected={setCategoryName}
                   />
