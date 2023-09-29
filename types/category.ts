@@ -64,7 +64,6 @@ export class Category {
             path,
             parentsUids
         );
-        console.log(`Creando ${data.name} con ParentUIDs[${parentsUids}]`)
         await newCategory.GetTasksToDoFirebase();
         await newCategory.GetTasksCompletedFirebase();
         await newCategory.GetTasksDeletedFirebase();
@@ -321,7 +320,6 @@ export class Category {
     }
 
     async GetSubCategories(): Promise<undefined> {
-        console.log(`Obteniendo las subcategorias de ${this.name} (${this.uid})`);
         this.subCategories = [];
         try {
             const q = query(
@@ -335,14 +333,10 @@ export class Category {
             const querySnapshot = await getDocs(q);
             const docs = querySnapshot.docs;
 
-            // Hay un error que me mete mas de una sub categoria a la vez
-            // Estamos queriendo eliminar las categorias y que vea reflejado en el momento de hacer la eliminacion.
-            // El eliminado y creado de subcategorias ya funciona, solo falta hacer que se vea reflejado en el momento.
             const parentsUids = this.parentsUids;
             parentsUids.push(this.uid);
 
             for (let i = 0; i < docs.length; i++) {
-                console.log("Cargando (en category)")
                 const cat = await Category.CreateCategoryWithTasksToDo(
                     docs[i].data(), 
                     docs[i].id, 
@@ -350,7 +344,6 @@ export class Category {
                     this.path + "/" + this.uid + "/" + COLLECTION_Category,
                     parentsUids
                 );
-                console.log("Listo (en category)")
                 this.subCategories.push(cat);
             }
         } catch(err) {

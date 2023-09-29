@@ -105,8 +105,8 @@ export const CategoryComponent = ({ cat, onCloseCategory }: ICategoryComponent) 
 
     setLoading(true);
     await cat.Delete();
+    await user.GetCategories();
     setLoading(false);
-    user.DeleteCategory(cat.uid, cat.parentsUids);
     setUser(new User(user));
     setOpenDelete(false);
     onCloseCategory();

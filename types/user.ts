@@ -73,12 +73,10 @@ export class User {
         const querySnapshot = await getDocs(q);
         const docs = querySnapshot.docs;
         for (let i = 0; i < docs.length; i++) {
-            console.log("cargando (en user)...");
             const cat = await Category.CreateCategoryWithTasksToDo(
                 docs[i].data(), docs[i].id, this.email, "",
                 []
             );
-            console.log("listo (en user)...");
             this.categories.push(cat);
         }
     }
@@ -133,66 +131,6 @@ export class User {
                 break;
             }
         }
-    }
-
-    _SearchCategory(uid: string, categories: Category[]): number {
-        for (let i = 0; i < categories.length; i++) {
-            if (categories[i].uid === uid) return i;
-        }
-        return -1;
-    }
-
-    _DeleteFirstItemOfArray(arr: string[]): string[] {
-        let newArr = [];
-
-        for (let i = 1; i < arr.length; i++) {
-            newArr.push(arr[i]);
-        }
-
-        return newArr;
-    }
-
-    _DeleteCategory(uid: string, categories: Category[], paths: string[]): Category[]|undefined {
-        let newCategories = [];
-        console.log("Me llega este path: ", paths);
-
-        if (paths.length === 0) {
-            for (const cat of categories) {
-                if (cat.uid !== uid) {
-                    newCategories.push(cat);
-                }
-            }
-
-            return newCategories;
-        }
-
-        if (paths.length !== 0) {
-            const catIdx = this._SearchCategory(paths[0], categories);
-            if (catIdx === -1) {
-                console.error(`CatIdx don't found at ${paths[0]}. Categories: ${categories}`);
-                return undefined;
-            }
-
-            console.log("Encontramos un padre: ", categories[catIdx].name);
-
-            const newCats = this._DeleteCategory(
-                uid, 
-                categories[catIdx].subCategories, 
-                this._DeleteFirstItemOfArray(paths)
-            );
-            
-            if (newCats === undefined) {
-                console.error(`_DeleteCategoy returned undefined at ${categories[catIdx].name}.`);
-                return undefined;
-            }
-            categories[catIdx].subCategories = newCats;
-        }
-
-
-    }
-
-    DeleteCategory(uidToDelete: string, paths: string[]): undefined {
-        this._DeleteCategory(uidToDelete, this.categories, paths)
     }
 
     GetCategoryFromName(name: string): Category|undefined {
