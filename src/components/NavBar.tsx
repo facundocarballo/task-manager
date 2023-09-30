@@ -14,6 +14,9 @@ import Link from "next/link";
 
 export const NavBar = () => {
   // Attributes
+  const imageStyle = {
+    borderRadius: "30px",
+  };
   // Context
   const { user } = useProvider();
   // Methods
@@ -36,7 +39,13 @@ export const NavBar = () => {
           <Link href={"/tasksDeleted"}>
             <Button variant="info">{"Tasks Deleted"}</Button>
           </Link>
-          <Image alt="userPhoto" src={user.photoUrl} width={50} height={50} />
+          <Image
+            alt="userPhoto"
+            src={user.photoUrl}
+            width={50}
+            height={50}
+            style={imageStyle}
+          />
           <Box w="10px" />
         </HStack>
       </VStack>
