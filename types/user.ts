@@ -171,36 +171,14 @@ export class User {
     }
 
     DeleteTaskFromTasksToDoToCompleted(task: Task): undefined {
-        const newTasks: Task[] = [];
-        for (let i = 0; i < this.categories.length; i++) {
-            const cat = this.categories[i];
-            if (cat.uid === task.category) {
-                for (let j = 0; j < cat.tasks.length; j++) {
-                    const t = cat.tasks[j];
-                    if (t.uid !== task.uid) {
-                        newTasks.push(t);
-                    }
-                }
-                this.categories[i].tasks = newTasks;
-                this.categories[i].tasksCompleted.push(task);
-            }
+        for (const cat of this.categories) {
+            cat.CompleteTask(task);
         }
     }
 
     DeleteTaskFromTasksToDoToDeleted(task: Task): undefined {
-        const newTasks: Task[] = [];
-        for (let i = 0; i < this.categories.length; i++) {
-            const cat = this.categories[i];
-            if (cat.uid === task.category) {
-                for (let j = 0; j < cat.tasks.length; j++) {
-                    const t = cat.tasks[j];
-                    if (t.uid !== task.uid) {
-                        newTasks.push(t);
-                    }
-                }
-                this.categories[i].tasks = newTasks;
-                this.categories[i].tasksDeleted.push(task);
-            }
+        for (const cat of this.categories) {
+            cat.DeleteTask(task);
         }
     }
 

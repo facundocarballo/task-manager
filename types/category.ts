@@ -65,8 +65,6 @@ export class Category {
             parentsUids
         );
         await newCategory._GetTasksToDoFirebase();
-        // await newCategory.GetTasksCompletedFirebase();
-        // await newCategory.GetTasksDeletedFirebase();
         await newCategory.GetSubCategories();
         return newCategory;
     }
@@ -127,6 +125,52 @@ export class Category {
     }
 
     // Tasks
+    CompleteTask(task: Task): undefined {
+        let newTasks: Task[] = [];
+        let aux = false;
+
+        for (const t of this.tasks) {
+            if (t.uid !== task.uid) 
+                newTasks.push(t);
+            else 
+                aux = true;
+        }
+
+        this.tasks = newTasks;
+        
+        if (aux) {
+            this.tasksCompleted.push(task);
+            return;
+        }
+
+        for (const subCat of this.subCategories) {
+            subCat.CompleteTask(task);
+        }
+    }
+
+    DeleteTask(task: Task): undefined {
+        let newTasks: Task[] = [];
+        let aux = false;
+
+        for (const t of this.tasks) {
+            if (t.uid !== task.uid) 
+                newTasks.push(t);
+            else 
+                aux = true;
+        }
+
+        this.tasks = newTasks;
+        
+        if (aux) {
+            this.tasksDeleted.push(task);
+            return;
+        }
+
+        for (const subCat of this.subCategories) {
+            subCat.DeleteTask(task);
+        }
+    }
+    
     async CreateTask(name: string, description: string, mustEnd?: Date): Promise<undefined> {
         try {
             const ref = doc(
