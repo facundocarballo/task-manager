@@ -37,11 +37,15 @@ import { FilterDate, Handler, SetFunc } from "../components/FilterDate";
 import { Task } from "@/types/task";
 import { GetCategories } from "../handlers/filter";
 
+
+let set: boolean = false;
+
 export const TasksDeleted = () => {
   // Attributes
   const [categoryName, setCategoryName] = React.useState<string>("Default");
   const [firstDate, setFirstDate] = React.useState<Date|undefined>(undefined);
   const [endDate, setEndDate] = React.useState<Date>(new Date(Date.now()));
+  const [allTasks, setAllTasks] =  React.useState<Task[]>([]);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef(null);
@@ -66,7 +70,7 @@ export const TasksDeleted = () => {
         return
       }
 
-      fileteredTasks = Task.FilterTasksByDates(user.tasksDeleted, firstDate, endDate, false);
+      fileteredTasks = Task.FilterTasksByDates(allTasks, firstDate, endDate, false);
   
       onClose();
       setTasksDeleted(fileteredTasks);
@@ -93,6 +97,14 @@ export const TasksDeleted = () => {
     setFirstDate(undefined);
     setEndDate(new Date(Date.now()))
   };
+
+  React.useEffect(() => {
+    if (user === null) return;
+    if (!set && tasksDeleted.length !== 0) {
+      set = true;
+      setAllTasks(tasksDeleted);
+    }
+  },);
 
   // Component
   return (

@@ -39,12 +39,15 @@ import { FilterDate, Handler, SetFunc } from "../components/FilterDate";
 import { Task } from "@/types/task";
 import { GetCategories } from "../handlers/filter";
 
+let set: boolean = false;
+
 export const TasksCompleted = () => {
   // Attributes
   const [accomplishTime, setAccomplishTime] = React.useState<string>("Default");
   const [categoryName, setCategoryName] = React.useState<string>("Default");
   const [firstDate, setFirstDate] = React.useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = React.useState<Date>(new Date(Date.now()));
+  const [allTasks, setAllTasks] =  React.useState<Task[]>([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const cancelRef = React.useRef(null);
 
@@ -71,10 +74,11 @@ export const TasksCompleted = () => {
     if (user == null) return;
     const cat = user.GetCategoryFromName(categoryName);
     let fileteredTasks: Task[] = [];
+    
 
     if (cat === undefined) {
       // Es default.
-      fileteredTasks = Task.FilterTasksByAccomplishTime(user.tasksCompleted, accomplishTime);
+      fileteredTasks = Task.FilterTasksByAccomplishTime(allTasks, accomplishTime);
       if(firstDate !== undefined)
         fileteredTasks = Task.FilterTasksByDates(fileteredTasks, firstDate, endDate, true);
   
@@ -100,6 +104,14 @@ export const TasksCompleted = () => {
     setFirstDate(undefined);
     setEndDate(new Date(Date.now()))
   };
+
+  React.useEffect(() => {
+    if (user === null) return;
+    if (!set && tasksCompleted.length !== 0) {
+      set = true;
+      setAllTasks(tasksCompleted);
+    }
+  },);
 
   // Component
   return (
